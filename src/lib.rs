@@ -26,24 +26,25 @@
 //!
 //! See [`flutterust`](https://github.com/shekohex/flutterust/tree/master/native/scrap-ffi) and how we used it in the `scrap` package to create a webscrapper using Rust and Flutter.
 
-use core::{
-    ptr,
-    sync::atomic::{AtomicPtr, Ordering},
-};
 /// Holds the Raw Dart FFI Types Required to send messages to Isolate
 pub mod ffi;
 
 mod into_dart;
 pub use into_dart::IntoDart;
 
-static POST_COBJECT: AtomicPtr<ffi::DartPostCObjectFnType> =
-    AtomicPtr::new(ptr::null_mut());
+// Please don't use `AtomicPtr` here
+// see https://github.com/rust-lang/rfcs/issues/2481
+static mut POST_COBJECT: Option<ffi::DartPostCObjectFnType> = None;
 
 /// Stores the function pointer of `Dart_PostCObject`, this only should be
 /// called once at the start up of the Dart/Flutter Application. it is exported
 /// and marked as `#[no_mangle]`.
 ///
 /// you could use it from Dart as following:
+///
+/// #### Safety
+/// This function should only be called once at the start up of the Dart
+/// application.
 ///
 /// ### Example
 /// ```dart,ignore
@@ -64,8 +65,10 @@ static POST_COBJECT: AtomicPtr<ffi::DartPostCObjectFnType> =
 /// storeDartPostCObject(NativeApi.postCObject);
 /// ```
 #[no_mangle]
-pub extern "C" fn store_dart_post_cobject(ptr: ffi::DartPostCObjectFnType) {
-    POST_COBJECT.store(ptr as *mut _, Ordering::SeqCst)
+pub unsafe extern "C" fn store_dart_post_cobject(
+    ptr: ffi::DartPostCObjectFnType,
+) {
+    POST_COBJECT = Some(ptr);
 }
 
 /// Simple wrapper around the Dart Isolate Port, nothing
@@ -103,20 +106,19 @@ impl Isolate {
     /// isolate.post("Hello Dart !");
     /// ```
     pub fn post(&self, msg: impl IntoDart) -> bool {
-        let post_cobject = POST_COBJECT.load(Ordering::SeqCst);
-        if post_cobject.is_null() {
-            false
-        } else {
-            unsafe {
+        unsafe {
+            if let Some(func) = POST_COBJECT {
                 let boxed_msg = Box::new(msg.into_dart());
                 let ptr = Box::into_raw(boxed_msg);
                 // Send the message
-                let result = (*post_cobject)(self.port, ptr);
+                let result = (func)(self.port, ptr);
                 // free the object
                 let boxed_obj = Box::from_raw(ptr);
                 drop(boxed_obj);
                 // I like that dance haha
                 result
+            } else {
+                false
             }
         }
     }
