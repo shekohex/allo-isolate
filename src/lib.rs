@@ -1,7 +1,123 @@
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+#![deny(
+    missing_docs,
+    missing_debug_implementations,
+    missing_copy_implementations,
+    elided_lifetimes_in_paths,
+    rust_2018_idioms,
+    clippy::fallible_impl_from,
+    clippy::missing_const_for_fn,
+    intra_doc_link_resolution_failure
+)]
+#![doc(html_logo_url = "https://avatars0.githubusercontent.com/u/55122894")]
+
+//! Allo Isolate
+//! Run Multithreaded Rust along with Dart VM (in isolate).
+//!
+//! Since you can't call into dart from other threads other than the main
+//! thread, that holds our rust code from beaing multithreaded, the way that can be done is using Dart [`Isolate`](https://api.dart.dev/stable/2.8.4/dart-isolate/Isolate-class.html)
+//! by creating an isolate, send its [`NativePort`](https://api.dart.dev/stable/2.8.4/dart-ffi/NativePort.html) to Rust side, then rust is freely could run and send the result back on that port.
+//!
+//! Interacting with Dart VM directly isn't that easy, that is why we created
+//! that library, it provides [`IntoDart`] trait to convert between Rust data
+//! types and Dart Types, and by default it is implemented for all common rust
+//! types.
+//!
+//! ### Example
+//!
+//! See [`flutterust`](https://github.com/shekohex/flutterust/tree/master/native/scrap-ffi) and how we used it in the `scrap` package to create a webscrapper using Rust and Flutter.
+
+use core::{
+    ptr,
+    sync::atomic::{AtomicPtr, Ordering},
+};
+/// Holds the Raw Dart FFI Types Required to send messages to Isolate
+pub mod ffi;
+
+mod into_dart;
+pub use into_dart::IntoDart;
+
+static POST_COBJECT: AtomicPtr<ffi::DartPostCObjectFnType> =
+    AtomicPtr::new(ptr::null_mut());
+
+/// Stores the function pointer of `Dart_PostCObject`, this only should be
+/// called once at the start up of the Dart/Flutter Application. it is exported
+/// and marked as `#[no_mangle]`.
+///
+/// you could use it from Dart as following:
+///
+/// ### Example
+/// ```dart,ignore
+/// import 'dart:ffi';
+///
+/// typedef dartPostCObject = Pointer Function(
+///         Pointer<NativeFunction<Int8 Function(Int64,
+/// Pointer<Dart_CObject>)>>);
+///
+/// // assumes that _dl is the `DynamicLibrary`
+/// final storeDartPostCObject =
+///     _dl.lookupFunction<dartPostCObject, dartPostCObject>(
+/// 'store_dart_post_cobject',
+/// );
+///
+/// // then later call
+///
+/// storeDartPostCObject(NativeApi.postCObject);
+/// ```
+#[no_mangle]
+pub extern "C" fn store_dart_post_cobject(ptr: ffi::DartPostCObjectFnType) {
+    POST_COBJECT.store(ptr as *mut _, Ordering::SeqCst)
+}
+
+/// Simple wrapper around the Dart Isolate Port, nothing
+/// else.
+#[derive(Copy, Clone, Debug)]
+pub struct Isolate {
+    port: i64,
+}
+
+impl Isolate {
+    /// Create a new `Isolate` with a port obtained from Dart VM side.
+    ///
+    /// #### Example
+    /// this a non realistic example lol :D
+    /// ```rust
+    /// # use allo_isolate::Isolate;
+    /// let isolate = Isolate::new(42);
+    /// ```
+    pub const fn new(port: i64) -> Self { Self { port } }
+
+    /// Post an object to the [`Isolate`] over the port
+    /// Object must implement [`IntoDart`].
+    ///
+    /// returns `true` if the message posted successfully, otherwise `false`
+    ///
+    /// #### Safety
+    /// This assumes that you called [`store_dart_post_cobject`] and we have
+    /// access to the `Dart_PostCObject` function pointer also, we do check
+    /// if it is not null.
+    ///
+    /// #### Example
+    /// ```rust
+    /// # use allo_isolate::Isolate;
+    /// let isolate = Isolate::new(42);
+    /// isolate.post("Hello Dart !");
+    /// ```
+    pub fn post(&self, msg: impl IntoDart) -> bool {
+        let post_cobject = POST_COBJECT.load(Ordering::SeqCst);
+        if post_cobject.is_null() {
+            false
+        } else {
+            unsafe {
+                let boxed_msg = Box::new(msg.into_dart());
+                let ptr = Box::into_raw(boxed_msg);
+                // Send the message
+                let result = (*post_cobject)(self.port, ptr);
+                // free the object
+                let boxed_obj = Box::from_raw(ptr);
+                drop(boxed_obj);
+                // I like that dance haha
+                result
+            }
+        }
     }
 }

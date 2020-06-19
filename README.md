@@ -1,7 +1,7 @@
 <h1 align="center">Allo Isolate (Dart VM)</h1>
 <div align="center">
   <strong>
-        Run async Rust along with Dart VM (in isolate)
+        Run Multithreaded Rust along with Dart VM (in isolate)
   </strong>
 
 </div>
