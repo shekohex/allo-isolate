@@ -220,12 +220,12 @@ where
 impl<T, E> IntoDart for Result<T, E>
 where
     T: IntoDart,
-    E: IntoDart,
+    E: ToString,
 {
     fn into_dart(self) -> DartCObject {
         match self {
             Ok(v) => v.into_dart(),
-            Err(e) => e.into_dart(),
+            Err(e) => e.to_string().into_dart(),
         }
     }
 }
