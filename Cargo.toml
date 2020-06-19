@@ -1,0 +1,14 @@
+[package]
+name = "allo-isolate"
+version = "0.1.0"
+authors = ["Sunshine Foundation Developers", "Shady Khalifa <shekohex@gmail.com>"]
+edition = "2018"
+description = "Run async Rust along with Dart VM (in isolate)."
+repository = "https://github.com/sunshine-protocol/allo-isolate"
+keywords = ["bindings", "ffi", "isolate", "dart"]
+categories = ["external-ffi-bindings", "development-tools::ffi"]
+readme = "README.md"
+homepage = "https://github.com/sunshine-protocol/allo-isolate"
+license-file = "LICENSE"
+
+[dependencies]
