@@ -111,7 +111,7 @@ impl Isolate {
                 let boxed_msg = Box::new(msg.into_dart());
                 let ptr = Box::into_raw(boxed_msg);
                 // Send the message
-                let result = (func)(self.port, ptr);
+                let result = func(self.port, ptr);
                 // free the object
                 let boxed_obj = Box::from_raw(ptr);
                 drop(boxed_obj);
