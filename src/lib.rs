@@ -124,7 +124,7 @@ impl Isolate {
         }
     }
 
-    /// Runs the task, await for the result and then post it
+    /// Consumes `Self`, Runs the task, await for the result and then post it
     /// to the [`Isolate`] over the port
     /// Result must implement [`IntoDart`].
     ///
@@ -142,7 +142,7 @@ impl Isolate {
     /// let isolate = Isolate::new(42);
     /// task::spawn(isolate.task(async { 1 + 2 }));
     /// ```
-    pub async fn task<T, R>(&self, t: T) -> bool
+    pub async fn task<T, R>(self, t: T) -> bool
     where
         T: Future<Output = R> + Send + 'static,
         R: Send + IntoDart + 'static,
