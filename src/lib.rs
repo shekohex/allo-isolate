@@ -31,6 +31,7 @@ pub mod ffi;
 
 mod into_dart;
 pub use into_dart::IntoDart;
+use std::future::Future;
 
 // Please don't use `AtomicPtr` here
 // see https://github.com/rust-lang/rfcs/issues/2481
@@ -121,5 +122,31 @@ impl Isolate {
                 false
             }
         }
+    }
+
+    /// Runs the task, await for the result and then post it
+    /// to the [`Isolate`] over the port
+    /// Result must implement [`IntoDart`].
+    ///
+    /// returns `true` if the message posted successfully, otherwise `false`
+    ///
+    /// #### Safety
+    /// This assumes that you called [`store_dart_post_cobject`] and we have
+    /// access to the `Dart_PostCObject` function pointer also, we do check
+    /// if it is not null.
+    ///
+    /// #### Example
+    /// ```rust,ignore
+    /// # use allo_isolate::Isolate;
+    /// use async_std::task;
+    /// let isolate = Isolate::new(42);
+    /// task::spawn(isolate.task(async { 1 + 2 }));
+    /// ```
+    pub async fn task<T, R>(&self, t: T) -> bool
+    where
+        T: Future<Output = R> + Send + 'static,
+        R: Send + IntoDart + 'static,
+    {
+        self.post(t.await)
     }
 }
