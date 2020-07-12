@@ -185,9 +185,19 @@ where
     T: IntoDart,
 {
     fn into_dart(self) -> DartCObject {
-        let vec: Vec<DartCObject> =
-            self.into_iter().map(|v| v.into_dart()).collect();
+        // items should be boxed, to make sure we can transfer it to dart side.
+        let vec: Vec<Box<DartCObject>> = self
+            .into_iter()
+            .map(|value| Box::new(value.into_dart()))
+            .collect();
+
         let (data, len) = (vec.as_ptr(), vec.len());
+
+        // should we mem::forget the vec?
+        // idk, dart gets a copy of the data, I guess that will not make any
+        // issues or that's what I hope hahaha.
+        // std::mem::forget(vec);
+
         let array = DartNativeArray {
             length: len as isize,
             values: data as *mut _,
