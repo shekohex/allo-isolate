@@ -1,0 +1,30 @@
+on: [push, pull_request]
+
+name: Valgrind Memory Check
+
+jobs:
+  valgrind:
+    name: Memory Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install nightly toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: true
+
+      - name: Install valgrind
+        run: sudo apt install -y valgrind
+
+      - name: Run cargo build
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --example containers
+
+      - name: Run valgrind
+        run: valgrind --leak-check=full ./target/debug/examples/containers
