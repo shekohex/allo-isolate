@@ -1,5 +1,6 @@
 #![allow(missing_docs)]
-use std::os::raw;
+use crate::dart_array::DartArray;
+use std::{ffi::CString, os::raw};
 
 /// A port is used to send or receive inter-isolate messages
 pub type DartPort = i64;
@@ -41,7 +42,7 @@ pub enum DartTypedDataType {
 /// Dart_WeakPersistentHandleFinalizer callback; a non-NULL callback must be
 /// provided.
 #[repr(i32)]
-#[derive(Copy, Clone, PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone, Copy)]
 pub enum DartCObjectType {
     DartNull = 0,
     DartBool = 1,
@@ -60,7 +61,6 @@ pub enum DartCObjectType {
 
 #[allow(missing_debug_implementations)]
 #[repr(C)]
-#[derive(Copy, Clone)]
 pub struct DartCObject {
     pub ty: DartCObjectType,
     pub value: DartCObjectValue,
@@ -68,7 +68,7 @@ pub struct DartCObject {
 
 #[allow(missing_debug_implementations)]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Clone, Copy)]
 pub union DartCObjectValue {
     pub as_bool: bool,
     pub as_int32: i32,
@@ -125,3 +125,13 @@ pub struct DartNativeTypedData {
 ///  return true if the message was posted.
 pub type DartPostCObjectFnType =
     unsafe extern "C" fn(port_id: DartPort, message: *mut DartCObject) -> bool;
+
+impl Drop for DartCObject {
+    fn drop(&mut self) {
+        if self.ty == DartCObjectType::DartString {
+            let _ = unsafe { CString::from_raw(self.value.as_string) };
+        } else if self.ty == DartCObjectType::DartArray {
+            DartArray::from(unsafe { self.value.as_array });
+        }
+    }
+}

@@ -10,3 +10,11 @@ categories = ["external-ffi-bindings", "development-tools::ffi"]
 readme = "README.md"
 homepage = "https://github.com/sunshine-protocol/allo-isolate"
 license-file = "LICENSE"
+
+[dev-dependencies]
+fastrand = "^1.3"
+
+# These are used for tests
+[[example]]
+name = "containers"
+path = "test/containers.rs"

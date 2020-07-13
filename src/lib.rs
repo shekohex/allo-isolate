@@ -27,11 +27,12 @@
 //! See [`flutterust`](https://github.com/shekohex/flutterust/tree/master/native/scrap-ffi) and how we used it in the `scrap` package to create a webscrapper using Rust and Flutter.
 
 /// Holds the Raw Dart FFI Types Required to send messages to Isolate
-pub mod ffi;
+use std::future::Future;
 
+mod dart_array;
+pub mod ffi;
 mod into_dart;
 pub use into_dart::IntoDart;
-use std::future::Future;
 
 // Please don't use `AtomicPtr` here
 // see https://github.com/rust-lang/rfcs/issues/2481

@@ -1,4 +1,4 @@
-use crate::ffi::*;
+use crate::{dart_array::DartArray, ffi::*};
 use std::ffi::CString;
 
 /// A trait to convert between Rust types and Dart Types that could then
@@ -106,6 +106,8 @@ impl IntoDart for i128 {
         DartCObject {
             ty: DartCObjectType::DartString,
             value: DartCObjectValue {
+                // the value of CString get droped when we drop DartCObject
+                // and that is happen after we send the message to the dart vm.
                 as_string: CString::new(self.to_string())
                     // this safe, since i128 can be converted to string
                     .unwrap_or_default()
@@ -184,29 +186,7 @@ impl<T> IntoDart for Vec<T>
 where
     T: IntoDart,
 {
-    fn into_dart(self) -> DartCObject {
-        // items should be boxed, to make sure we can transfer it to dart side.
-        let vec: Vec<Box<DartCObject>> = self
-            .into_iter()
-            .map(|value| Box::new(value.into_dart()))
-            .collect();
-
-        let (data, len) = (vec.as_ptr(), vec.len());
-
-        // should we mem::forget the vec?
-        // idk, dart gets a copy of the data, I guess that will not make any
-        // issues or that's what I hope hahaha.
-        // std::mem::forget(vec);
-
-        let array = DartNativeArray {
-            length: len as isize,
-            values: data as *mut _,
-        };
-        DartCObject {
-            ty: DartCObjectType::DartArray,
-            value: DartCObjectValue { as_array: array },
-        }
-    }
+    fn into_dart(self) -> DartCObject { DartArray::from(self).into_dart() }
 }
 
 impl<T> IntoDart for Option<T>
