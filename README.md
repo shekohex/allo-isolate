@@ -17,6 +17,10 @@
     <img src="https://github.com/sunshine-protocol/allo-isolate/workflows/Security%20audit/badge.svg"
       alt="Security" />
   </a>
+   <a href="https://github.com/sunshine-protocol/allo-isolate">
+    <img src="https://github.com/sunshine-protocol/allo-isolate/workflows/Valgrind%20Memory%20Check/badge.svg"
+      alt="Valgrind Memory Check" />
+  </a>
   <a href="https://crates.io/crates/allo-isolate">
     <img src="https://img.shields.io/crates/v/allo-isolate.svg"
       alt="crates.io" />
