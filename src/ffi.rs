@@ -132,6 +132,30 @@ impl Drop for DartCObject {
             let _ = unsafe { CString::from_raw(self.value.as_string) };
         } else if self.ty == DartCObjectType::DartArray {
             DartArray::from(unsafe { self.value.as_array });
+        } else if self.ty == DartCObjectType::DartTypedData {
+            let v = unsafe { self.value.as_typed_data };
+            let ty = v.ty;
+            match ty {
+                DartTypedDataType::Int8 => {
+                    let _ = unsafe {
+                        Vec::from_raw_parts(
+                            v.values as *mut i8,
+                            v.length as usize,
+                            v.length as usize,
+                        )
+                    };
+                },
+                DartTypedDataType::Uint8 => {
+                    let _ = unsafe {
+                        Vec::from_raw_parts(
+                            v.values as *mut u8,
+                            v.length as usize,
+                            v.length as usize,
+                        )
+                    };
+                },
+                _ => {},
+            };
         }
     }
 }

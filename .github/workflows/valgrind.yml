@@ -27,4 +27,4 @@ jobs:
           args: --example containers
 
       - name: Run valgrind
-        run: valgrind --leak-check=full ./target/debug/examples/containers
+        run: valgrind --error-exitcode=1 --leak-check=full ./target/debug/examples/containers
