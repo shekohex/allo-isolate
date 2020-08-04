@@ -1,5 +1,5 @@
 use crate::{dart_array::DartArray, ffi::*};
-use std::ffi::CString;
+use std::{ffi::CString, mem::ManuallyDrop};
 
 /// A trait to convert between Rust types and Dart Types that could then
 /// be sended to the isolate
@@ -15,50 +15,6 @@ where
     T: Into<DartCObject>,
 {
     fn into_dart(self) -> DartCObject { self.into() }
-}
-
-impl IntoDart for u8 {
-    fn into_dart(self) -> DartCObject {
-        DartCObject {
-            ty: DartCObjectType::DartInt32,
-            value: DartCObjectValue {
-                as_int32: self as i32,
-            },
-        }
-    }
-}
-
-impl IntoDart for i8 {
-    fn into_dart(self) -> DartCObject {
-        DartCObject {
-            ty: DartCObjectType::DartInt32,
-            value: DartCObjectValue {
-                as_int32: self as i32,
-            },
-        }
-    }
-}
-
-impl IntoDart for u16 {
-    fn into_dart(self) -> DartCObject {
-        DartCObject {
-            ty: DartCObjectType::DartInt32,
-            value: DartCObjectValue {
-                as_int32: self as i32,
-            },
-        }
-    }
-}
-
-impl IntoDart for i16 {
-    fn into_dart(self) -> DartCObject {
-        DartCObject {
-            ty: DartCObjectType::DartInt32,
-            value: DartCObjectValue {
-                as_int32: self as i32,
-            },
-        }
-    }
 }
 
 impl IntoDart for u32 {
@@ -178,6 +134,42 @@ impl IntoDart for CString {
             value: DartCObjectValue {
                 as_string: self.into_raw(),
             },
+        }
+    }
+}
+
+impl IntoDart for Vec<u8> {
+    fn into_dart(self) -> DartCObject {
+        let mut vec = ManuallyDrop::new(self);
+        let data = DartNativeTypedData {
+            ty: DartTypedDataType::Uint8,
+            length: vec.len() as isize,
+            values: vec.as_mut_ptr(),
+        };
+        let value = DartCObjectValue {
+            as_typed_data: data,
+        };
+        DartCObject {
+            ty: DartCObjectType::DartTypedData,
+            value,
+        }
+    }
+}
+
+impl IntoDart for Vec<i8> {
+    fn into_dart(self) -> DartCObject {
+        let mut vec = ManuallyDrop::new(self);
+        let data = DartNativeTypedData {
+            ty: DartTypedDataType::Int8,
+            length: vec.len() as isize,
+            values: vec.as_mut_ptr() as *mut _,
+        };
+        let value = DartCObjectValue {
+            as_typed_data: data,
+        };
+        DartCObject {
+            ty: DartCObjectType::DartTypedData,
+            value,
         }
     }
 }
