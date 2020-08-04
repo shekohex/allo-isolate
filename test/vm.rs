@@ -132,20 +132,12 @@ impl VMIsolate {
                 match ty {
                     DartTypedDataType::Int8 => {
                         let _ = unsafe {
-                            Vec::from_raw_parts(
-                                v.values as *mut i8,
-                                v.length as usize,
-                                v.length as usize,
-                            )
+                            from_buf_raw(v.values as *mut i8, v.length as usize)
                         };
                     },
                     DartTypedDataType::Uint8 => {
                         let _ = unsafe {
-                            Vec::from_raw_parts(
-                                v.values as *mut i8,
-                                v.length as usize,
-                                v.length as usize,
-                            )
+                            from_buf_raw(v.values as *mut u8, v.length as usize)
                         };
                     },
                     _ => unimplemented!(),
@@ -157,6 +149,13 @@ impl VMIsolate {
         };
         true
     }
+}
+
+unsafe fn from_buf_raw<T>(ptr: *const T, elts: usize) -> Vec<T> {
+    let mut dst = Vec::with_capacity(elts);
+    dst.set_len(elts);
+    std::ptr::copy(ptr, dst.as_mut_ptr(), elts);
+    dst
 }
 
 pub extern "C" fn dart_post_cobject(port: i64, msg: *mut DartCObject) -> bool {
