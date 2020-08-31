@@ -17,6 +17,18 @@ where
     fn into_dart(self) -> DartCObject { self.into() }
 }
 
+impl IntoDart for () {
+    fn into_dart(self) -> DartCObject {
+        DartCObject {
+            ty: DartCObjectType::DartNull,
+            // I don't know what value should we send, so I send a false
+            // I guess dart vm check for the type first, so if it is null it
+            // return null and ignore the value
+            value: DartCObjectValue { as_bool: false },
+        }
+    }
+}
+
 impl IntoDart for u32 {
     fn into_dart(self) -> DartCObject {
         DartCObject {
@@ -188,13 +200,7 @@ where
     fn into_dart(self) -> DartCObject {
         match self {
             Some(v) => v.into_dart(),
-            None => DartCObject {
-                ty: DartCObjectType::DartNull,
-                // I don't know what value should we send, so I send a false
-                // I guess dart vm check for the type first, so if it is null it
-                // return null and ignore the value
-                value: DartCObjectValue { as_bool: false },
-            },
+            None => ().into_dart(),
         }
     }
 }

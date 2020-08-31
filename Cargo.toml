@@ -1,6 +1,6 @@
 [package]
 name = "allo-isolate"
-version = "0.1.6"
+version = "0.1.7"
 authors = ["Sunshine Foundation Developers", "Shady Khalifa <shekohex@gmail.com>"]
 edition = "2018"
 description = "Run Multithreaded Rust along with Dart VM (in isolate)."
@@ -11,6 +11,9 @@ readme = "README.md"
 homepage = "https://github.com/sunshine-protocol/allo-isolate"
 license-file = "LICENSE"
 
+[dependencies]
+pin-project = { version = "0.4", optional = true }
+
 [dev-dependencies]
 fastrand = "^1.3"
 
@@ -18,3 +21,10 @@ fastrand = "^1.3"
 [[example]]
 name = "containers"
 path = "test/containers.rs"
+
+[features]
+default = []
+catch-unwind = ["pin-project"]
+
+[package.metadata.docs.rs]
+all-features = true
