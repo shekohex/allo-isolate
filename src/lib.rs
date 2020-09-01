@@ -71,7 +71,9 @@ static mut POST_COBJECT: Option<ffi::DartPostCObjectFnType> = None;
 /// storeDartPostCObject(NativeApi.postCObject);
 /// ```
 #[no_mangle]
-pub unsafe extern "C" fn store_dart_post_cobject(ptr: ffi::DartPostCObjectFnType) {
+pub unsafe extern "C" fn store_dart_post_cobject(
+    ptr: ffi::DartPostCObjectFnType,
+) {
     POST_COBJECT = Some(ptr);
 }
 
@@ -91,9 +93,7 @@ impl Isolate {
     /// # use allo_isolate::Isolate;
     /// let isolate = Isolate::new(42);
     /// ```
-    pub const fn new(port: i64) -> Self {
-        Self { port }
-    }
+    pub const fn new(port: i64) -> Self { Self { port } }
 
     /// Post an object to the [`Isolate`] over the port
     /// Object must implement [`IntoDart`].
@@ -158,7 +158,10 @@ impl Isolate {
     /// Similar to [`Isolate::task`] but with more logic to catch any panic and
     /// report it back
     #[cfg(feature = "catch-unwind")]
-    pub async fn catch_unwind<T, R>(self, t: T) -> Result<bool, Box<dyn std::any::Any + Send>>
+    pub async fn catch_unwind<T, R>(
+        self,
+        t: T,
+    ) -> Result<bool, Box<dyn std::any::Any + Send>>
     where
         T: Future<Output = R> + Send + 'static,
         R: Send + IntoDart + 'static,
