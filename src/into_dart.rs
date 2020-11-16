@@ -14,7 +14,9 @@ impl<T> IntoDart for T
 where
     T: Into<DartCObject>,
 {
-    fn into_dart(self) -> DartCObject { self.into() }
+    fn into_dart(self) -> DartCObject {
+        self.into()
+    }
 }
 
 impl IntoDart for () {
@@ -136,7 +138,9 @@ impl IntoDart for String {
 }
 
 impl IntoDart for &'_ str {
-    fn into_dart(self) -> DartCObject { self.to_string().into_dart() }
+    fn into_dart(self) -> DartCObject {
+        self.to_string().into_dart()
+    }
 }
 
 impl IntoDart for CString {
@@ -190,7 +194,9 @@ impl<T> IntoDart for Vec<T>
 where
     T: IntoDart,
 {
-    fn into_dart(self) -> DartCObject { DartArray::from(self).into_dart() }
+    fn into_dart(self) -> DartCObject {
+        DartArray::from(self).into_dart()
+    }
 }
 
 impl<T> IntoDart for Option<T>
@@ -214,6 +220,57 @@ where
         match self {
             Ok(v) => v.into_dart(),
             Err(e) => e.to_string().into_dart(),
+        }
+    }
+}
+
+/// A workaround to send raw pointers to dart over the port.
+/// it will be sent as int64 on 64bit targets, and as int32 on 32bit targets.
+
+#[cfg(target_pointer_width = "64")]
+impl<T> IntoDart for *const T {
+    fn into_dart(self) -> DartCObject {
+        DartCObject {
+            ty: DartCObjectType::DartInt64,
+            value: DartCObjectValue {
+                as_int64: self as _,
+            },
+        }
+    }
+}
+
+#[cfg(target_pointer_width = "64")]
+impl<T> IntoDart for *mut T {
+    fn into_dart(self) -> DartCObject {
+        DartCObject {
+            ty: DartCObjectType::DartInt64,
+            value: DartCObjectValue {
+                as_int64: self as _,
+            },
+        }
+    }
+}
+
+#[cfg(target_pointer_width = "32")]
+impl<T> IntoDart for *const T {
+    fn into_dart(self) -> DartCObject {
+        DartCObject {
+            ty: DartCObjectType::DartInt32,
+            value: DartCObjectValue {
+                as_int32: self as _,
+            },
+        }
+    }
+}
+
+#[cfg(target_pointer_width = "32")]
+impl<T> IntoDart for *mut T {
+    fn into_dart(self) -> DartCObject {
+        DartCObject {
+            ty: DartCObjectType::DartInt32,
+            value: DartCObjectValue {
+                as_int32: self as _,
+            },
         }
     }
 }
