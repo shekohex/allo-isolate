@@ -79,6 +79,7 @@ pub union DartCObjectValue {
     pub as_capability: DartNativeCapability,
     pub as_array: DartNativeArray,
     pub as_typed_data: DartNativeTypedData,
+    pub as_external_typed_data: DartNativeExternalTypedData,
     _bindgen_union_align: [u64; 5usize],
 }
 
@@ -108,6 +109,16 @@ pub struct DartNativeTypedData {
     pub ty: DartTypedDataType,
     pub length: isize,
     pub values: *mut u8,
+}
+
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DartNativeExternalTypedData {
+    pub ty: DartTypedDataType,
+    pub length: isize,
+    pub data: *mut u8,
+    pub peer: *mut u8,
+    pub callback: unsafe extern "C" fn(isize, *mut u8),
 }
 
 ///  Posts a message on some port. The message will contain the
