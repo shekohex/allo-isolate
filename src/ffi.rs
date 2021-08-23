@@ -121,6 +121,12 @@ pub struct DartNativeExternalTypedData {
     pub callback: unsafe extern "C" fn(isize, *mut u8),
 }
 
+#[no_mangle]
+pub unsafe extern "C" fn deallocate_rust_buffer(len: isize, ptr: *mut u8) {
+    let len = len as usize;
+    drop(Vec::from_raw_parts(ptr, len, len));
+}
+
 ///  Posts a message on some port. The message will contain the
 ///  Dart_CObject object graph rooted in 'message'.
 ///
