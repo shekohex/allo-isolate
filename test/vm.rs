@@ -149,7 +149,10 @@ impl VMIsolate {
                 match ty {
                     DartTypedDataType::Uint8 => {
                         let _ = unsafe {
-                            from_buf_raw(v.data as *mut u8, v.length as usize)
+                            let output = from_buf_raw(v.data as *mut u8, v.length as usize);
+                            let cb = v.callback;
+                            cb(v.length, v.peer);
+                            output
                         };
                     }
                     _ => unimplemented!(),
