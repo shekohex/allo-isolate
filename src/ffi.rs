@@ -121,6 +121,11 @@ pub struct DartNativeExternalTypedData {
     pub callback: unsafe extern "C" fn(isize, *mut u8),
 }
 
+/// Wrapping a Vec<u8> in this tuple struct will allow into_dart()
+/// to send it as a DartNativeExternalTypedData buffer with no copy overhead
+#[derive(Debug, Clone)]
+pub struct ZeroCopyBuffer<T>(pub T);
+
 #[no_mangle]
 pub unsafe extern "C" fn deallocate_rust_buffer(len: isize, ptr: *mut u8) {
     let len = len as usize;

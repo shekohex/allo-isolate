@@ -143,6 +143,18 @@ impl VMIsolate {
                     _ => unimplemented!(),
                 };
             },
+            DartExternalTypedData => {
+                let v = unsafe { o.value.as_external_typed_data };
+                let ty = v.ty;
+                match ty {
+                    DartTypedDataType::Uint8 => {
+                        let _ = unsafe {
+                            from_buf_raw(v.data as *mut u8, v.length as usize)
+                        };
+                    }
+                    _ => unimplemented!(),
+                };
+            }
             _ => {
                 unimplemented!();
             },

@@ -1,4 +1,4 @@
-use allo_isolate::Isolate;
+use allo_isolate::{ffi::ZeroCopyBuffer, Isolate};
 mod vm;
 
 fn main() {
@@ -33,4 +33,5 @@ fn main() {
     assert!(isolate.post(vec![String::from("Dart"); 1024]));
     assert!(isolate.post(vec![42u8; 100]));
     assert!(isolate.post(vec![42u128; 100]));
+    assert!(isolate.post(ZeroCopyBuffer(vec![42u8; 100])));
 }
