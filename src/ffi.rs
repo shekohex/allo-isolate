@@ -167,7 +167,7 @@ impl Drop for DartCObject {
                             v.length as usize,
                         )
                     };
-                }
+                },
                 DartTypedDataType::Uint8 => {
                     let _ = unsafe {
                         Vec::from_raw_parts(
@@ -176,8 +176,8 @@ impl Drop for DartCObject {
                             v.length as usize,
                         )
                     };
-                }
-                _ => {}
+                },
+                _ => {},
             };
         }
     }

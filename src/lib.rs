@@ -5,8 +5,7 @@
     elided_lifetimes_in_paths,
     rust_2018_idioms,
     clippy::fallible_impl_from,
-    clippy::missing_const_for_fn,
-    broken_intra_doc_links
+    clippy::missing_const_for_fn
 )]
 #![doc(html_logo_url = "https://avatars0.githubusercontent.com/u/55122894")]
 
@@ -94,9 +93,7 @@ impl Isolate {
     /// # use allo_isolate::Isolate;
     /// let isolate = Isolate::new(42);
     /// ```
-    pub const fn new(port: i64) -> Self {
-        Self { port }
-    }
+    pub const fn new(port: i64) -> Self { Self { port } }
 
     /// Post an object to the [`Isolate`] over the port
     /// Object must implement [`IntoDart`].

@@ -49,9 +49,7 @@ impl DartVM {
 struct VMIsolate;
 
 impl VMIsolate {
-    const fn new() -> Self {
-        Self
-    }
+    const fn new() -> Self { Self }
 
     fn exec(&mut self, object: *mut DartCObject) -> bool {
         use DartCObjectType::*;
@@ -63,7 +61,7 @@ impl VMIsolate {
                     ty: DartNull,
                     value: DartCObjectValue { as_bool: false },
                 };
-            }
+            },
             DartBool => {
                 DartCObject {
                     ty: DartBool,
@@ -71,7 +69,7 @@ impl VMIsolate {
                         as_bool: unsafe { o.value.as_bool },
                     },
                 };
-            }
+            },
             DartInt32 => {
                 DartCObject {
                     ty: DartInt32,
@@ -79,7 +77,7 @@ impl VMIsolate {
                         as_int32: unsafe { o.value.as_int32 },
                     },
                 };
-            }
+            },
             DartInt64 => {
                 DartCObject {
                     ty: DartInt64,
@@ -87,7 +85,7 @@ impl VMIsolate {
                         as_int64: unsafe { o.value.as_int64 },
                     },
                 };
-            }
+            },
             DartDouble => {
                 DartCObject {
                     ty: DartDouble,
@@ -95,7 +93,7 @@ impl VMIsolate {
                         as_double: unsafe { o.value.as_double },
                     },
                 };
-            }
+            },
             DartString => {
                 {
                     let s =
@@ -107,7 +105,7 @@ impl VMIsolate {
                         },
                     }
                 };
-            }
+            },
             DartArray => {
                 // do something with o
                 // I'm semulating that I copied some data into the VM here
@@ -127,7 +125,7 @@ impl VMIsolate {
                         },
                     },
                 };
-            }
+            },
             DartTypedData => {
                 let v = unsafe { o.value.as_typed_data };
                 let ty = v.ty;
@@ -136,15 +134,15 @@ impl VMIsolate {
                         let _ = unsafe {
                             from_buf_raw(v.values as *mut i8, v.length as usize)
                         };
-                    }
+                    },
                     DartTypedDataType::Uint8 => {
                         let _ = unsafe {
                             from_buf_raw(v.values as *mut u8, v.length as usize)
                         };
-                    }
+                    },
                     _ => unimplemented!(),
                 };
-            }
+            },
             DartExternalTypedData => {
                 let v = unsafe { o.value.as_external_typed_data };
                 let ty = v.ty;
@@ -159,13 +157,13 @@ impl VMIsolate {
                             cb(v.length, v.peer);
                             output
                         };
-                    }
+                    },
                     _ => unimplemented!(),
                 };
-            }
+            },
             _ => {
                 unimplemented!();
-            }
+            },
         };
         true
     }
@@ -182,6 +180,4 @@ pub extern "C" fn dart_post_cobject(port: i64, msg: *mut DartCObject) -> bool {
     DART_VM.with(|vm| vm.post(port, msg))
 }
 
-pub fn port() -> i64 {
-    DART_VM.with(|vm| vm.port())
-}
+pub fn port() -> i64 { DART_VM.with(|vm| vm.port()) }

@@ -1,4 +1,4 @@
-use allo_isolate::{ffi::ZeroCopyBuffer, Isolate};
+use allo_isolate::{Isolate, ZeroCopyBuffer};
 mod vm;
 
 fn main() {
