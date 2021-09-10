@@ -79,6 +79,7 @@ pub union DartCObjectValue {
     pub as_capability: DartNativeCapability,
     pub as_array: DartNativeArray,
     pub as_typed_data: DartNativeTypedData,
+    pub as_external_typed_data: DartNativeExternalTypedData,
     _bindgen_union_align: [u64; 5usize],
 }
 
@@ -108,6 +109,28 @@ pub struct DartNativeTypedData {
     pub ty: DartTypedDataType,
     pub length: isize,
     pub values: *mut u8,
+}
+
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DartNativeExternalTypedData {
+    pub ty: DartTypedDataType,
+    pub length: isize,
+    pub data: *mut u8,
+    pub peer: *mut u8,
+    pub callback: unsafe extern "C" fn(isize, *mut u8),
+}
+
+/// Wrapping a Vec<u8> in this tuple struct will allow into_dart()
+/// to send it as a DartNativeExternalTypedData buffer with no copy overhead
+#[derive(Debug, Clone)]
+pub struct ZeroCopyBuffer<T>(pub T);
+
+#[doc(hidden)]
+#[no_mangle]
+pub unsafe extern "C" fn deallocate_rust_buffer(len: isize, ptr: *mut u8) {
+    let len = len as usize;
+    drop(Vec::from_raw_parts(ptr, len, len));
 }
 
 ///  Posts a message on some port. The message will contain the
@@ -144,7 +167,7 @@ impl Drop for DartCObject {
                             v.length as usize,
                         )
                     };
-                },
+                }
                 DartTypedDataType::Uint8 => {
                     let _ = unsafe {
                         Vec::from_raw_parts(
@@ -153,8 +176,8 @@ impl Drop for DartCObject {
                             v.length as usize,
                         )
                     };
-                },
-                _ => {},
+                }
+                _ => {}
             };
         }
     }
