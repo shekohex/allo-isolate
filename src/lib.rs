@@ -36,6 +36,7 @@ mod into_dart;
 mod catch_unwind;
 
 pub mod ffi;
+pub use ffi::ZeroCopyBuffer;
 pub use into_dart::IntoDart;
 
 // Please don't use `AtomicPtr` here

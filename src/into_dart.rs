@@ -191,12 +191,12 @@ impl IntoDart for Vec<i8> {
 }
 
 impl IntoDart for ZeroCopyBuffer<Vec<u8>> {
-    fn into_dart(mut self) -> DartCObject {
-        self.0.shrink_to_fit();
-        let length = self.0.len();
-        assert!(length == self.0.capacity());
-        let ptr = self.0.as_mut_ptr();
-        std::mem::forget(self);
+    fn into_dart(self) -> DartCObject {
+        let mut vec = ManuallyDrop::new(self.0);
+        vec.shrink_to_fit();
+        let length = vec.len();
+        assert!(length == vec.capacity());
+        let ptr = vec.as_mut_ptr();
 
         DartCObject {
             ty: DartCObjectType::DartExternalTypedData,
