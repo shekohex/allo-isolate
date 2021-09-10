@@ -13,7 +13,9 @@ use std::{
 pub struct CatchUnwind<F: Future>(#[pin] F);
 
 impl<F: Future> CatchUnwind<F> {
-    pub fn new(f: F) -> Self { Self(f) }
+    pub fn new(f: F) -> Self {
+        Self(f)
+    }
 }
 
 impl<F> Future for CatchUnwind<F>

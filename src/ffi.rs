@@ -126,6 +126,7 @@ pub struct DartNativeExternalTypedData {
 #[derive(Debug, Clone)]
 pub struct ZeroCopyBuffer<T>(pub T);
 
+#[doc(hidden)]
 #[no_mangle]
 pub unsafe extern "C" fn deallocate_rust_buffer(len: isize, ptr: *mut u8) {
     let len = len as usize;
@@ -166,7 +167,7 @@ impl Drop for DartCObject {
                             v.length as usize,
                         )
                     };
-                },
+                }
                 DartTypedDataType::Uint8 => {
                     let _ = unsafe {
                         Vec::from_raw_parts(
@@ -175,8 +176,8 @@ impl Drop for DartCObject {
                             v.length as usize,
                         )
                     };
-                },
-                _ => {},
+                }
+                _ => {}
             };
         }
     }
