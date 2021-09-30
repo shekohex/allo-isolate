@@ -1,11 +1,11 @@
 #![deny(
-    missing_docs,
-    missing_debug_implementations,
-    missing_copy_implementations,
-    elided_lifetimes_in_paths,
-    rust_2018_idioms,
-    clippy::fallible_impl_from,
-    clippy::missing_const_for_fn
+missing_docs,
+missing_debug_implementations,
+missing_copy_implementations,
+elided_lifetimes_in_paths,
+rust_2018_idioms,
+clippy::fallible_impl_from,
+clippy::missing_const_for_fn
 )]
 #![doc(html_logo_url = "https://avatars0.githubusercontent.com/u/55122894")]
 
@@ -28,15 +28,17 @@
 /// Holds the Raw Dart FFI Types Required to send messages to Isolate
 use std::future::Future;
 
+pub use ffi::ZeroCopyBuffer;
+pub use into_dart::IntoDart;
+
 mod dart_array;
 mod into_dart;
+mod into_dart_extra;
 
 #[cfg(feature = "catch-unwind")]
 mod catch_unwind;
 
 pub mod ffi;
-pub use ffi::ZeroCopyBuffer;
-pub use into_dart::IntoDart;
 
 // Please don't use `AtomicPtr` here
 // see https://github.com/rust-lang/rfcs/issues/2481
@@ -148,9 +150,9 @@ impl Isolate {
     /// task::spawn(isolate.task(async { 1 + 2 }));
     /// ```
     pub async fn task<T, R>(self, t: T) -> bool
-    where
-        T: Future<Output = R> + Send + 'static,
-        R: Send + IntoDart + 'static,
+        where
+            T: Future<Output=R> + Send + 'static,
+            R: Send + IntoDart + 'static,
     {
         self.post(t.await)
     }
@@ -162,9 +164,9 @@ impl Isolate {
         self,
         t: T,
     ) -> Result<bool, Box<dyn std::any::Any + Send>>
-    where
-        T: Future<Output = R> + Send + 'static,
-        R: Send + IntoDart + 'static,
+        where
+            T: Future<Output=R> + Send + 'static,
+            R: Send + IntoDart + 'static,
     {
         catch_unwind::CatchUnwind::new(t)
             .await
