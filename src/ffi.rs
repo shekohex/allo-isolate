@@ -132,7 +132,10 @@ pub struct ZeroCopyBuffer<T>(pub T);
 
 #[doc(hidden)]
 #[no_mangle]
-pub unsafe extern "C" fn deallocate_rust_zero_copy_buffer(len: isize, ptr: *mut u8) {
+pub unsafe extern "C" fn deallocate_rust_zero_copy_buffer(
+    len: isize,
+    ptr: *mut u8,
+) {
     let len = len as usize;
     drop(Vec::from_raw_parts(ptr, len, len));
 }
@@ -151,7 +154,7 @@ pub unsafe extern "C" fn deallocate_rust_zero_copy_buffer(len: isize, ptr: *mut 
 ///
 ///  return true if the message was posted.
 pub type DartPostCObjectFnType =
-unsafe extern "C" fn(port_id: DartPort, message: *mut DartCObject) -> bool;
+    unsafe extern "C" fn(port_id: DartPort, message: *mut DartCObject) -> bool;
 
 impl Drop for DartCObject {
     fn drop(&mut self) {
@@ -194,7 +197,8 @@ impl Drop for DartCObject {
                 // do NOT free any memory here
                 // see https://github.com/sunshine-protocol/allo-isolate/issues/7
             }
-            DartSendPort | DartCapability | DartUnsupported | DartNumberOfTypes => {
+            DartSendPort | DartCapability | DartUnsupported
+            | DartNumberOfTypes => {
                 // not sure what to do here
             }
         }

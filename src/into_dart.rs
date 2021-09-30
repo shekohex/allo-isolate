@@ -12,10 +12,12 @@ pub trait IntoDart {
 }
 
 impl<T> IntoDart for T
-    where
-        T: Into<DartCObject>,
+where
+    T: Into<DartCObject>,
 {
-    fn into_dart(self) -> DartCObject { self.into() }
+    fn into_dart(self) -> DartCObject {
+        self.into()
+    }
 }
 
 impl IntoDart for () {
@@ -49,7 +51,9 @@ impl IntoDart for i64 {
 }
 
 impl IntoDart for f32 {
-    fn into_dart(self) -> DartCObject { (self as f64).into_dart() }
+    fn into_dart(self) -> DartCObject {
+        (self as f64).into_dart()
+    }
 }
 
 impl IntoDart for f64 {
@@ -78,7 +82,9 @@ impl IntoDart for String {
 }
 
 impl IntoDart for &'_ str {
-    fn into_dart(self) -> DartCObject { self.to_string().into_dart() }
+    fn into_dart(self) -> DartCObject {
+        self.to_string().into_dart()
+    }
 }
 
 impl IntoDart for CString {
@@ -98,7 +104,10 @@ impl Num8Bit for u8 {}
 
 impl Num8Bit for i8 {}
 
-fn vec_8bit_to_dart<T: Num8Bit>(vec: Vec<T>, ty: DartTypedDataType) -> DartCObject {
+fn vec_8bit_to_dart<T: Num8Bit>(
+    vec: Vec<T>,
+    ty: DartTypedDataType,
+) -> DartCObject {
     let mut vec = ManuallyDrop::new(vec);
     let data = DartNativeTypedData {
         ty,
@@ -107,7 +116,9 @@ fn vec_8bit_to_dart<T: Num8Bit>(vec: Vec<T>, ty: DartTypedDataType) -> DartCObje
     };
     DartCObject {
         ty: DartCObjectType::DartTypedData,
-        value: DartCObjectValue { as_typed_data: data },
+        value: DartCObjectValue {
+            as_typed_data: data,
+        },
     }
 }
 
@@ -147,15 +158,17 @@ impl IntoDart for ZeroCopyBuffer<Vec<u8>> {
 }
 
 impl<T> IntoDart for Vec<T>
-    where
-        T: IntoDart,
+where
+    T: IntoDart,
 {
-    fn into_dart(self) -> DartCObject { DartArray::from(self).into_dart() }
+    fn into_dart(self) -> DartCObject {
+        DartArray::from(self).into_dart()
+    }
 }
 
 impl<T> IntoDart for Option<T>
-    where
-        T: IntoDart,
+where
+    T: IntoDart,
 {
     fn into_dart(self) -> DartCObject {
         match self {
@@ -166,9 +179,9 @@ impl<T> IntoDart for Option<T>
 }
 
 impl<T, E> IntoDart for Result<T, E>
-    where
-        T: IntoDart,
-        E: ToString,
+where
+    T: IntoDart,
+    E: ToString,
 {
     fn into_dart(self) -> DartCObject {
         match self {
