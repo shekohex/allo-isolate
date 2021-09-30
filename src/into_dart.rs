@@ -1,8 +1,9 @@
-use crate::{dart_array::DartArray, ffi::*};
 use std::{ffi::CString, mem::ManuallyDrop};
 
+use crate::{dart_array::DartArray, ffi::*};
+
 /// A trait to convert between Rust types and Dart Types that could then
-/// be sended to the isolate
+/// be sent to the isolate
 ///
 /// see: [`crate::Isolate::post`]
 pub trait IntoDart {
@@ -29,33 +30,11 @@ impl IntoDart for () {
     }
 }
 
-impl IntoDart for u32 {
-    fn into_dart(self) -> DartCObject {
-        DartCObject {
-            ty: DartCObjectType::DartInt32,
-            value: DartCObjectValue {
-                as_int32: self as i32,
-            },
-        }
-    }
-}
-
 impl IntoDart for i32 {
     fn into_dart(self) -> DartCObject {
         DartCObject {
             ty: DartCObjectType::DartInt32,
             value: DartCObjectValue { as_int32: self },
-        }
-    }
-}
-
-impl IntoDart for u64 {
-    fn into_dart(self) -> DartCObject {
-        DartCObject {
-            ty: DartCObjectType::DartInt64,
-            value: DartCObjectValue {
-                as_int64: self as i64,
-            },
         }
     }
 }
@@ -69,45 +48,8 @@ impl IntoDart for i64 {
     }
 }
 
-impl IntoDart for i128 {
-    fn into_dart(self) -> DartCObject {
-        DartCObject {
-            ty: DartCObjectType::DartString,
-            value: DartCObjectValue {
-                // the value of CString get droped when we drop DartCObject
-                // and that is happen after we send the message to the dart vm.
-                as_string: CString::new(self.to_string())
-                    // this safe, since i128 can be converted to string
-                    .unwrap_or_default()
-                    .into_raw(),
-            },
-        }
-    }
-}
-
-impl IntoDart for u128 {
-    fn into_dart(self) -> DartCObject {
-        DartCObject {
-            ty: DartCObjectType::DartString,
-            value: DartCObjectValue {
-                as_string: CString::new(self.to_string())
-                    // this safe, since u128 can be converted to string
-                    .unwrap_or_default()
-                    .into_raw(),
-            },
-        }
-    }
-}
-
 impl IntoDart for f32 {
-    fn into_dart(self) -> DartCObject {
-        DartCObject {
-            ty: DartCObjectType::DartDouble,
-            value: DartCObjectValue {
-                as_double: self as f64,
-            },
-        }
-    }
+    fn into_dart(self) -> DartCObject { (self as f64).into_dart() }
 }
 
 impl IntoDart for f64 {
@@ -150,39 +92,39 @@ impl IntoDart for CString {
     }
 }
 
+trait Num8Bit {}
+
+impl Num8Bit for u8 {}
+
+impl Num8Bit for i8 {}
+
+fn vec_8bit_to_dart<T: Num8Bit>(
+    vec: Vec<T>,
+    ty: DartTypedDataType,
+) -> DartCObject {
+    let mut vec = ManuallyDrop::new(vec);
+    let data = DartNativeTypedData {
+        ty,
+        length: vec.len() as isize,
+        values: vec.as_mut_ptr() as *mut _,
+    };
+    DartCObject {
+        ty: DartCObjectType::DartTypedData,
+        value: DartCObjectValue {
+            as_typed_data: data,
+        },
+    }
+}
+
 impl IntoDart for Vec<u8> {
     fn into_dart(self) -> DartCObject {
-        let mut vec = ManuallyDrop::new(self);
-        let data = DartNativeTypedData {
-            ty: DartTypedDataType::Uint8,
-            length: vec.len() as isize,
-            values: vec.as_mut_ptr(),
-        };
-        let value = DartCObjectValue {
-            as_typed_data: data,
-        };
-        DartCObject {
-            ty: DartCObjectType::DartTypedData,
-            value,
-        }
+        vec_8bit_to_dart(self, DartTypedDataType::Uint8)
     }
 }
 
 impl IntoDart for Vec<i8> {
     fn into_dart(self) -> DartCObject {
-        let mut vec = ManuallyDrop::new(self);
-        let data = DartNativeTypedData {
-            ty: DartTypedDataType::Int8,
-            length: vec.len() as isize,
-            values: vec.as_mut_ptr() as *mut _,
-        };
-        let value = DartCObjectValue {
-            as_typed_data: data,
-        };
-        DartCObject {
-            ty: DartCObjectType::DartTypedData,
-            value,
-        }
+        vec_8bit_to_dart(self, DartTypedDataType::Int8)
     }
 }
 
@@ -191,7 +133,7 @@ impl IntoDart for ZeroCopyBuffer<Vec<u8>> {
         let mut vec = ManuallyDrop::new(self.0);
         vec.shrink_to_fit();
         let length = vec.len();
-        assert!(length == vec.capacity());
+        assert_eq!(length, vec.capacity());
         let ptr = vec.as_mut_ptr();
 
         DartCObject {
@@ -202,7 +144,7 @@ impl IntoDart for ZeroCopyBuffer<Vec<u8>> {
                     length: length as isize,
                     data: ptr,
                     peer: ptr,
-                    callback: deallocate_rust_buffer,
+                    callback: deallocate_rust_zero_copy_buffer,
                 },
             },
         }
@@ -243,7 +185,6 @@ where
 
 /// A workaround to send raw pointers to dart over the port.
 /// it will be sent as int64 on 64bit targets, and as int32 on 32bit targets.
-
 #[cfg(target_pointer_width = "64")]
 impl<T> IntoDart for *const T {
     fn into_dart(self) -> DartCObject {

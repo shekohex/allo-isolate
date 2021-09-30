@@ -1,9 +1,11 @@
-//! A FFI Compatable Array for Dart
+//! A FFI Compatible Array for Dart
+
+use core::slice;
+use std::mem::ManuallyDrop;
+
+use ffi::{DartCObject, DartCObjectType, DartCObjectValue, DartNativeArray};
 
 use crate::{ffi, IntoDart};
-use core::slice;
-use ffi::{DartCObject, DartCObjectType, DartCObjectValue, DartNativeArray};
-use std::mem::ManuallyDrop;
 
 /// A wrapper around a list of `DartCObject` that will be dropped after been
 /// sent to dart vm.
@@ -15,10 +17,10 @@ pub struct DartArray {
 impl<T: IntoDart> From<Vec<T>> for DartArray {
     fn from(vec: Vec<T>) -> Self {
         let vec: Vec<_> = vec.
-        into_iter()
+            into_iter()
             // convert them to dart objects
             .map(IntoDart::into_dart)
-            // box them to be transfered to dart
+            // box them to be transferred to dart
             .map(Box::new)
             // as pointers
             .map(Box::into_raw)

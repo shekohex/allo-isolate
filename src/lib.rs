@@ -28,15 +28,17 @@
 /// Holds the Raw Dart FFI Types Required to send messages to Isolate
 use std::future::Future;
 
+pub use ffi::ZeroCopyBuffer;
+pub use into_dart::IntoDart;
+
 mod dart_array;
 mod into_dart;
+mod into_dart_extra;
 
 #[cfg(feature = "catch-unwind")]
 mod catch_unwind;
 
 pub mod ffi;
-pub use ffi::ZeroCopyBuffer;
-pub use into_dart::IntoDart;
 
 // Please don't use `AtomicPtr` here
 // see https://github.com/rust-lang/rfcs/issues/2481

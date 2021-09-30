@@ -1,4 +1,5 @@
 use allo_isolate::{Isolate, ZeroCopyBuffer};
+
 mod vm;
 
 fn main() {
@@ -6,7 +7,7 @@ fn main() {
         allo_isolate::store_dart_post_cobject(vm::dart_post_cobject);
     }
     let port = vm::port();
-    assert!(port != -1);
+    assert_ne!(port, -1);
     let isolate = Isolate::new(port);
     assert!(isolate.post(42i32));
     assert!(isolate.post(42u32));
@@ -18,7 +19,7 @@ fn main() {
     assert!(isolate.post(false));
 
     let port = vm::port();
-    assert!(port != -1);
+    assert_ne!(port, -1);
     let isolate = Isolate::new(port);
 
     assert!(isolate.post(String::new()));
@@ -26,7 +27,7 @@ fn main() {
     assert!(isolate.post("Hello Dart"));
 
     let port = vm::port();
-    assert!(port != -1);
+    assert_ne!(port, -1);
     let isolate = Isolate::new(port);
 
     assert!(isolate.post(vec![String::from("Rust"); 8]));
