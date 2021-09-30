@@ -156,7 +156,7 @@ impl Drop for DartCObject {
         if self.ty == DartCObjectType::DartString {
             let _ = unsafe { CString::from_raw(self.value.as_string) };
         } else if self.ty == DartCObjectType::DartArray {
-            DartArray::from(unsafe { self.value.as_array });
+            let _ = DartArray::from(unsafe { self.value.as_array });
         } else if self.ty == DartCObjectType::DartTypedData {
             let v = unsafe { self.value.as_typed_data };
             let ty = v.ty;
