@@ -31,14 +31,7 @@ impl IntoDart for () {
 }
 
 impl IntoDart for u32 {
-    fn into_dart(self) -> DartCObject {
-        DartCObject {
-            ty: DartCObjectType::DartInt32,
-            value: DartCObjectValue {
-                as_int32: self as i32,
-            },
-        }
-    }
+    fn into_dart(self) -> DartCObject { (self as i32).into_dart() }
 }
 
 impl IntoDart for i32 {
@@ -51,14 +44,7 @@ impl IntoDart for i32 {
 }
 
 impl IntoDart for u64 {
-    fn into_dart(self) -> DartCObject {
-        DartCObject {
-            ty: DartCObjectType::DartInt64,
-            value: DartCObjectValue {
-                as_int64: self as i64,
-            },
-        }
-    }
+    fn into_dart(self) -> DartCObject { (self as i64).into_dart() }
 }
 
 impl IntoDart for i64 {
@@ -71,15 +57,11 @@ impl IntoDart for i64 {
 }
 
 impl IntoDart for i128 {
-    fn into_dart(self) -> DartCObject {
-        self.to_string().into_dart()
-    }
+    fn into_dart(self) -> DartCObject { self.to_string().into_dart() }
 }
 
 impl IntoDart for u128 {
-    fn into_dart(self) -> DartCObject {
-        self.to_string().into_dart()
-    }
+    fn into_dart(self) -> DartCObject { self.to_string().into_dart() }
 }
 
 impl IntoDart for f32 {
