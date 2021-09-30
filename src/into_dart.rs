@@ -92,33 +92,34 @@ impl IntoDart for CString {
     }
 }
 
+trait Num8Bit {}
+
+impl Num8Bit for u8 {}
+
+impl Num8Bit for i8 {}
+
+fn vec_8bit_to_dart<T: Num8Bit>(vec: &Vec<T>, ty: DartTypedDataType) -> DartCObject {
+    let mut vec = ManuallyDrop::new(vec);
+    let data = DartNativeTypedData {
+        ty,
+        length: vec.len() as isize,
+        values: vec.as_mut_ptr() as *mut _,
+    };
+    DartCObject {
+        ty: DartCObjectType::DartTypedData,
+        value: DartCObjectValue { as_typed_data: data },
+    }
+}
+
 impl IntoDart for Vec<u8> {
     fn into_dart(self) -> DartCObject {
-        let mut vec = ManuallyDrop::new(self);
-        let data = DartNativeTypedData {
-            ty: DartTypedDataType::Uint8,
-            length: vec.len() as isize,
-            values: vec.as_mut_ptr(),
-        };
-        DartCObject {
-            ty: DartCObjectType::DartTypedData,
-            value: DartCObjectValue { as_typed_data: data },
-        }
+        vec_8bit_to_dart(&self, DartTypedDataType::Uint8)
     }
 }
 
 impl IntoDart for Vec<i8> {
     fn into_dart(self) -> DartCObject {
-        let mut vec = ManuallyDrop::new(self);
-        let data = DartNativeTypedData {
-            ty: DartTypedDataType::Int8,
-            length: vec.len() as isize,
-            values: vec.as_mut_ptr() as *mut _,
-        };
-        DartCObject {
-            ty: DartCObjectType::DartTypedData,
-            value: DartCObjectValue { as_typed_data: data },
-        }
+        vec_8bit_to_dart(&self, DartTypedDataType::Int8)
     }
 }
 
