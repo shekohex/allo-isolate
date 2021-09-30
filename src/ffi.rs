@@ -179,7 +179,7 @@ impl Drop for DartCObject {
                         )
                     };
                 }
-                _ => {}
+                _ => panic!("DartCObject::Drop see unexpected DartTypedDataType {:?} - we should free some memory, but it is not implemented yet", ty)
             };
         }
     }
