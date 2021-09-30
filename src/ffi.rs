@@ -2,6 +2,8 @@
 
 use std::{ffi::CString, os::raw};
 
+use DartCObjectType::*;
+
 use crate::dart_array::DartArray;
 
 /// A port is used to send or receive inter-isolate messages
@@ -153,34 +155,48 @@ unsafe extern "C" fn(port_id: DartPort, message: *mut DartCObject) -> bool;
 
 impl Drop for DartCObject {
     fn drop(&mut self) {
-        if self.ty == DartCObjectType::DartString {
-            let _ = unsafe { CString::from_raw(self.value.as_string) };
-        } else if self.ty == DartCObjectType::DartArray {
-            let _ = DartArray::from(unsafe { self.value.as_array });
-        } else if self.ty == DartCObjectType::DartTypedData {
-            let v = unsafe { self.value.as_typed_data };
-            let ty = v.ty;
-            match ty {
-                DartTypedDataType::Int8 => {
-                    let _ = unsafe {
-                        Vec::from_raw_parts(
-                            v.values as *mut i8,
-                            v.length as usize,
-                            v.length as usize,
-                        )
-                    };
-                }
-                DartTypedDataType::Uint8 => {
-                    let _ = unsafe {
-                        Vec::from_raw_parts(
-                            v.values as *mut u8,
-                            v.length as usize,
-                            v.length as usize,
-                        )
-                    };
-                }
-                _ => panic!("DartCObject::Drop see unexpected DartTypedDataType {:?} - we should free some memory, but it is not implemented yet", ty)
-            };
+        match self.ty {
+            DartString => {
+                let _ = unsafe { CString::from_raw(self.value.as_string) };
+            }
+            DartArray => {
+                let _ = DartArray::from(unsafe { self.value.as_array });
+            }
+            DartTypedData => {
+                let v = unsafe { self.value.as_typed_data };
+                match v.ty {
+                    DartTypedDataType::Int8 => {
+                        let _ = unsafe {
+                            Vec::from_raw_parts(
+                                v.values as *mut i8,
+                                v.length as usize,
+                                v.length as usize,
+                            )
+                        };
+                    }
+                    DartTypedDataType::Uint8 => {
+                        let _ = unsafe {
+                            Vec::from_raw_parts(
+                                v.values as *mut u8,
+                                v.length as usize,
+                                v.length as usize,
+                            )
+                        };
+                    }
+                    _ => panic!("DartCObject::Drop see unexpected DartTypedDataType {:?} - we should free some memory, but it is not implemented yet", v.ty)
+                };
+            }
+            // write out all cases in order to be explicit - we do not want to leak any memory
+            DartNull | DartBool | DartInt32 | DartInt64 | DartDouble => {
+                // do nothing, since they are primitive types
+            }
+            DartExternalTypedData => {
+                // do NOT free any memory here
+                // see https://github.com/sunshine-protocol/allo-isolate/issues/7
+            }
+            DartSendPort | DartCapability | DartUnsupported | DartNumberOfTypes => {
+                // not sure what to do here
+            }
         }
     }
 }
