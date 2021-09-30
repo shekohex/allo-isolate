@@ -100,12 +100,9 @@ impl IntoDart for Vec<u8> {
             length: vec.len() as isize,
             values: vec.as_mut_ptr(),
         };
-        let value = DartCObjectValue {
-            as_typed_data: data,
-        };
         DartCObject {
             ty: DartCObjectType::DartTypedData,
-            value,
+            value: DartCObjectValue { as_typed_data: data },
         }
     }
 }
@@ -118,12 +115,9 @@ impl IntoDart for Vec<i8> {
             length: vec.len() as isize,
             values: vec.as_mut_ptr() as *mut _,
         };
-        let value = DartCObjectValue {
-            as_typed_data: data,
-        };
         DartCObject {
             ty: DartCObjectType::DartTypedData,
-            value,
+            value: DartCObjectValue { as_typed_data: data },
         }
     }
 }
