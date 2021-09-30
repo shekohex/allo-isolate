@@ -3,7 +3,7 @@ use std::{ffi::CString, mem::ManuallyDrop};
 use crate::{dart_array::DartArray, ffi::*};
 
 /// A trait to convert between Rust types and Dart Types that could then
-/// be sended to the isolate
+/// be sent to the isolate
 ///
 /// see: [`crate::Isolate::post`]
 pub trait IntoDart {
@@ -133,7 +133,7 @@ impl IntoDart for ZeroCopyBuffer<Vec<u8>> {
         let mut vec = ManuallyDrop::new(self.0);
         vec.shrink_to_fit();
         let length = vec.len();
-        assert!(length == vec.capacity());
+        assert_eq!(length, vec.capacity());
         let ptr = vec.as_mut_ptr();
 
         DartCObject {
