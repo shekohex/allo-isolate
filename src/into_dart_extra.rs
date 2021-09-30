@@ -2,7 +2,7 @@
 //! that Dart receives will not be the same as the type you send in Rust. For example, numeric
 //! types can become String.
 
-use crate::{dart_array::DartArray, ffi::*};
+use crate::ffi::*;
 use crate::IntoDart;
 
 impl IntoDart for u32 {

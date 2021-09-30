@@ -98,7 +98,7 @@ impl Num8Bit for u8 {}
 
 impl Num8Bit for i8 {}
 
-fn vec_8bit_to_dart<T: Num8Bit>(vec: &Vec<T>, ty: DartTypedDataType) -> DartCObject {
+fn vec_8bit_to_dart<T: Num8Bit>(vec: Vec<T>, ty: DartTypedDataType) -> DartCObject {
     let mut vec = ManuallyDrop::new(vec);
     let data = DartNativeTypedData {
         ty,
@@ -113,13 +113,13 @@ fn vec_8bit_to_dart<T: Num8Bit>(vec: &Vec<T>, ty: DartTypedDataType) -> DartCObj
 
 impl IntoDart for Vec<u8> {
     fn into_dart(self) -> DartCObject {
-        vec_8bit_to_dart(&self, DartTypedDataType::Uint8)
+        vec_8bit_to_dart(self, DartTypedDataType::Uint8)
     }
 }
 
 impl IntoDart for Vec<i8> {
     fn into_dart(self) -> DartCObject {
-        vec_8bit_to_dart(&self, DartTypedDataType::Int8)
+        vec_8bit_to_dart(self, DartTypedDataType::Int8)
     }
 }
 
