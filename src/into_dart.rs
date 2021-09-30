@@ -1,5 +1,6 @@
-use crate::{dart_array::DartArray, ffi::*};
 use std::{ffi::CString, mem::ManuallyDrop};
+
+use crate::{dart_array::DartArray, ffi::*};
 
 /// A trait to convert between Rust types and Dart Types that could then
 /// be sended to the isolate
@@ -11,8 +12,8 @@ pub trait IntoDart {
 }
 
 impl<T> IntoDart for T
-where
-    T: Into<DartCObject>,
+    where
+        T: Into<DartCObject>,
 {
     fn into_dart(self) -> DartCObject { self.into() }
 }
@@ -71,31 +72,13 @@ impl IntoDart for i64 {
 
 impl IntoDart for i128 {
     fn into_dart(self) -> DartCObject {
-        DartCObject {
-            ty: DartCObjectType::DartString,
-            value: DartCObjectValue {
-                // the value of CString get droped when we drop DartCObject
-                // and that is happen after we send the message to the dart vm.
-                as_string: CString::new(self.to_string())
-                    // this safe, since i128 can be converted to string
-                    .unwrap_or_default()
-                    .into_raw(),
-            },
-        }
+        self.to_string().into_dart()
     }
 }
 
 impl IntoDart for u128 {
     fn into_dart(self) -> DartCObject {
-        DartCObject {
-            ty: DartCObjectType::DartString,
-            value: DartCObjectValue {
-                as_string: CString::new(self.to_string())
-                    // this safe, since u128 can be converted to string
-                    .unwrap_or_default()
-                    .into_raw(),
-            },
-        }
+        self.to_string().into_dart()
     }
 }
 
@@ -210,15 +193,15 @@ impl IntoDart for ZeroCopyBuffer<Vec<u8>> {
 }
 
 impl<T> IntoDart for Vec<T>
-where
-    T: IntoDart,
+    where
+        T: IntoDart,
 {
     fn into_dart(self) -> DartCObject { DartArray::from(self).into_dart() }
 }
 
 impl<T> IntoDart for Option<T>
-where
-    T: IntoDart,
+    where
+        T: IntoDart,
 {
     fn into_dart(self) -> DartCObject {
         match self {
@@ -229,9 +212,9 @@ where
 }
 
 impl<T, E> IntoDart for Result<T, E>
-where
-    T: IntoDart,
-    E: ToString,
+    where
+        T: IntoDart,
+        E: ToString,
 {
     fn into_dart(self) -> DartCObject {
         match self {
@@ -243,7 +226,6 @@ where
 
 /// A workaround to send raw pointers to dart over the port.
 /// it will be sent as int64 on 64bit targets, and as int32 on 32bit targets.
-
 #[cfg(target_pointer_width = "64")]
 impl<T> IntoDart for *const T {
     fn into_dart(self) -> DartCObject {
