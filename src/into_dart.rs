@@ -139,7 +139,7 @@ impl IntoDart for ZeroCopyBuffer<Vec<u8>> {
                     length: length as isize,
                     data: ptr,
                     peer: ptr,
-                    callback: deallocate_rust_buffer,
+                    callback: deallocate_rust_zero_copy_buffer,
                 },
             },
         }

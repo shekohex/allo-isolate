@@ -1,6 +1,8 @@
 #![allow(missing_docs)]
-use crate::dart_array::DartArray;
+
 use std::{ffi::CString, os::raw};
+
+use crate::dart_array::DartArray;
 
 /// A port is used to send or receive inter-isolate messages
 pub type DartPort = i64;
@@ -128,7 +130,7 @@ pub struct ZeroCopyBuffer<T>(pub T);
 
 #[doc(hidden)]
 #[no_mangle]
-pub unsafe extern "C" fn deallocate_rust_buffer(len: isize, ptr: *mut u8) {
+pub unsafe extern "C" fn deallocate_rust_zero_copy_buffer(len: isize, ptr: *mut u8) {
     let len = len as usize;
     drop(Vec::from_raw_parts(ptr, len, len));
 }
@@ -147,7 +149,7 @@ pub unsafe extern "C" fn deallocate_rust_buffer(len: isize, ptr: *mut u8) {
 ///
 ///  return true if the message was posted.
 pub type DartPostCObjectFnType =
-    unsafe extern "C" fn(port_id: DartPort, message: *mut DartCObject) -> bool;
+unsafe extern "C" fn(port_id: DartPort, message: *mut DartCObject) -> bool;
 
 impl Drop for DartCObject {
     fn drop(&mut self) {
@@ -167,7 +169,7 @@ impl Drop for DartCObject {
                             v.length as usize,
                         )
                     };
-                },
+                }
                 DartTypedDataType::Uint8 => {
                     let _ = unsafe {
                         Vec::from_raw_parts(
@@ -176,8 +178,8 @@ impl Drop for DartCObject {
                             v.length as usize,
                         )
                     };
-                },
-                _ => {},
+                }
+                _ => {}
             };
         }
     }
