@@ -49,14 +49,7 @@ impl IntoDart for i64 {
 }
 
 impl IntoDart for f32 {
-    fn into_dart(self) -> DartCObject {
-        DartCObject {
-            ty: DartCObjectType::DartDouble,
-            value: DartCObjectValue {
-                as_double: self as f64,
-            },
-        }
-    }
+    fn into_dart(self) -> DartCObject { (self as f64).into_dart() }
 }
 
 impl IntoDart for f64 {
