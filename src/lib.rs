@@ -31,6 +31,9 @@ use std::{future::Future, sync::atomic::Ordering};
 pub use ffi::ZeroCopyBuffer;
 pub use into_dart::IntoDart;
 
+pub use ffi::ZeroCopyBuffer;
+pub use into_dart::IntoDart;
+
 mod dart_array;
 mod into_dart;
 mod into_dart_extra;
