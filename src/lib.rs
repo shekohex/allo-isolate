@@ -24,9 +24,9 @@
 //! ### Example
 //!
 //! See [`flutterust`](https://github.com/shekohex/flutterust/tree/master/native/scrap-ffi) and how we used it in the `scrap` package to create a webscrapper using Rust and Flutter.
-
 /// Holds the Raw Dart FFI Types Required to send messages to Isolate
-use std::future::Future;
+use atomic::Atomic;
+use std::{future::Future, sync::atomic::Ordering};
 
 pub use ffi::ZeroCopyBuffer;
 pub use into_dart::IntoDart;
@@ -42,7 +42,8 @@ pub mod ffi;
 
 // Please don't use `AtomicPtr` here
 // see https://github.com/rust-lang/rfcs/issues/2481
-static mut POST_COBJECT: Option<ffi::DartPostCObjectFnType> = None;
+static POST_COBJECT: Atomic<Option<ffi::DartPostCObjectFnType>> =
+    Atomic::new(None);
 
 /// Stores the function pointer of `Dart_PostCObject`, this only should be
 /// called once at the start up of the Dart/Flutter Application. it is exported
@@ -76,7 +77,7 @@ static mut POST_COBJECT: Option<ffi::DartPostCObjectFnType> = None;
 pub unsafe extern "C" fn store_dart_post_cobject(
     ptr: ffi::DartPostCObjectFnType,
 ) {
-    POST_COBJECT = Some(ptr);
+    POST_COBJECT.store(Some(ptr), Ordering::Relaxed);
 }
 
 /// Simple wrapper around the Dart Isolate Port, nothing
@@ -114,8 +115,8 @@ impl Isolate {
     /// isolate.post("Hello Dart !");
     /// ```
     pub fn post(&self, msg: impl IntoDart) -> bool {
-        unsafe {
-            if let Some(func) = POST_COBJECT {
+        if let Some(func) = POST_COBJECT.load(Ordering::Relaxed) {
+            unsafe {
                 let boxed_msg = Box::new(msg.into_dart());
                 let ptr = Box::into_raw(boxed_msg);
                 // Send the message
@@ -125,9 +126,9 @@ impl Isolate {
                 drop(boxed_obj);
                 // I like that dance haha
                 result
-            } else {
-                false
             }
+        } else {
+            false
         }
     }
 
