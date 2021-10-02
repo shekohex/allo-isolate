@@ -13,6 +13,7 @@ license-file = "LICENSE"
 
 [dependencies]
 pin-project = { version = "0.4", optional = true }
+atomic = "0.5"
 
 [dev-dependencies]
 fastrand = "^1.3"
