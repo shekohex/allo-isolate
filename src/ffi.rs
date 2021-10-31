@@ -6,6 +6,7 @@ use std::ffi::c_void;
 use DartCObjectType::*;
 
 use crate::dart_array::DartArray;
+use crate::into_dart::{DartTypedDataTypeTrait, DartTypedDataTypeVisitor};
 
 /// A port is used to send or receive inter-isolate messages
 pub type DartPort = i64;
@@ -136,16 +137,6 @@ type DartHandleFinalizer = unsafe extern "C" fn(isolate_callback_data: *mut c_vo
 #[derive(Debug, Clone)]
 pub struct ZeroCopyBuffer<T>(pub T);
 
-#[doc(hidden)]
-#[no_mangle]
-pub unsafe extern "C" fn deallocate_rust_zero_copy_buffer(
-    len: isize,
-    ptr: *mut u8,
-) {
-    let len = len as usize;
-    drop(Vec::from_raw_parts(ptr, len, len));
-}
-
 ///  Posts a message on some port. The message will contain the
 ///  Dart_CObject object graph rooted in 'message'.
 ///
@@ -172,28 +163,21 @@ impl Drop for DartCObject {
                 let _ = DartArray::from(unsafe { self.value.as_array });
             },
             DartTypedData => {
+                struct MyVisitor<'a>(&'a DartNativeTypedData);
+                impl DartTypedDataTypeVisitor for MyVisitor<'_> {
+                    fn visit<T: DartTypedDataTypeTrait>(&self) {
+                        let _ = unsafe {
+                            Vec::from_raw_parts(
+                                self.0.values as *mut T,
+                                self.0.length as usize,
+                                self.0.length as usize,
+                            )
+                        };
+                    }
+                }
+
                 let v = unsafe { self.value.as_typed_data };
-                match v.ty {
-                    DartTypedDataType::Int8 => {
-                        let _ = unsafe {
-                            Vec::from_raw_parts(
-                                v.values as *mut i8,
-                                v.length as usize,
-                                v.length as usize,
-                            )
-                        };
-                    }
-                    DartTypedDataType::Uint8 => {
-                        let _ = unsafe {
-                            Vec::from_raw_parts(
-                                v.values as *mut u8,
-                                v.length as usize,
-                                v.length as usize,
-                            )
-                        };
-                    }
-                    _ => panic!("DartCObject::Drop see unexpected DartTypedDataType {:?} - we should free some memory, but it is not implemented yet", v.ty)
-                };
+                visit_dart_typed_data_type(v.ty, MyVisitor(&v));
             },
             // write out all cases in order to be explicit - we do not want to
             // leak any memory

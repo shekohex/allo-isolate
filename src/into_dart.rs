@@ -1,4 +1,4 @@
-use std::{ffi::CString, mem::ManuallyDrop};
+use std::{ffi::CString, mem::ManuallyDrop, ffi::c_void};
 
 use crate::{dart_array::DartArray, ffi::*};
 
@@ -15,7 +15,9 @@ impl<T> IntoDart for T
 where
     T: Into<DartCObject>,
 {
-    fn into_dart(self) -> DartCObject { self.into() }
+    fn into_dart(self) -> DartCObject {
+        self.into()
+    }
 }
 
 impl IntoDart for () {
@@ -49,7 +51,9 @@ impl IntoDart for i64 {
 }
 
 impl IntoDart for f32 {
-    fn into_dart(self) -> DartCObject { (self as f64).into_dart() }
+    fn into_dart(self) -> DartCObject {
+        (self as f64).into_dart()
+    }
 }
 
 impl IntoDart for f64 {
@@ -78,7 +82,9 @@ impl IntoDart for String {
 }
 
 impl IntoDart for &'_ str {
-    fn into_dart(self) -> DartCObject { self.to_string().into_dart() }
+    fn into_dart(self) -> DartCObject {
+        self.to_string().into_dart()
+    }
 }
 
 impl IntoDart for CString {
@@ -92,43 +98,82 @@ impl IntoDart for CString {
     }
 }
 
-trait Num8Bit {}
+pub(crate) trait DartTypedDataTypeVisitor {
+    fn visit<T: DartTypedDataTypeTrait>(&self);
+}
 
-impl Num8Bit for u8 {}
+/// The Rust type for corresponding [DartTypedDataType]
+pub(crate) trait DartTypedDataTypeTrait {
+    fn dart_typed_data_type() -> DartTypedDataType;
 
-impl Num8Bit for i8 {}
+    unsafe extern "C" fn deallocate_rust_zero_copy_buffer(
+        isolate_callback_data: *mut c_void,
+        peer: *mut c_void,
+    );
+}
 
-fn vec_8bit_to_dart<T: Num8Bit>(
-    vec: Vec<T>,
-    ty: DartTypedDataType,
-) -> DartCObject {
-    let mut vec = ManuallyDrop::new(vec);
-    let data = DartNativeTypedData {
-        ty,
-        length: vec.len() as isize,
-        values: vec.as_mut_ptr() as *mut _,
-    };
-    DartCObject {
-        ty: DartCObjectType::DartTypedData,
-        value: DartCObjectValue {
-            as_typed_data: data,
-        },
+macro_rules! dart_typed_data_type_trait_impl {
+    ($($dart_type:expr => $rust_type:ident),+) => {
+        $(
+            impl DartTypedDataTypeTrait for $rust_type {
+                fn dart_typed_data_type() -> DartTypedDataType {
+                    $dart_type
+                }
+            }
+
+            #[doc(hidden)]
+            #[no_mangle]
+            unsafe extern "C" fn deallocate_rust_zero_copy_buffer(
+                isolate_callback_data: *mut c_void,
+                peer: *mut c_void,
+            ) {
+                let len = (isolate_callback_data as isize) as usize;
+                let ptr = peer as *mut $rust_type;
+                drop(Vec::from_raw_parts(ptr, len, len));
+            }
+        ),+
+
+        pub(crate) fn visit_dart_typed_data_type<V: DartTypedDataTypeVisitor>(ty: DartTypedDataType, visitor: &V) {
+            match ty {
+                $(
+                    $dart_type => visitor.visit::<$rust_type>(),
+                ),+
+            }
+        }
     }
 }
 
-impl IntoDart for Vec<u8> {
+dart_typed_data_type_trait_impl!(
+    DartTypedDataType::Int8 => i8,
+    DartTypedDataType::Uint8 => u8,
+    DartTypedDataType::Int16 => i16,
+    DartTypedDataType::Uint16 => u16,
+    DartTypedDataType::Int32 => i32,
+    DartTypedDataType::Uint32 => u32,
+    DartTypedDataType::Int64 => i64,
+    DartTypedDataType::Uint64 => u64,
+    DartTypedDataType::Float32 => f32,
+    DartTypedDataType::Float64 => f64,
+);
+
+impl<T> IntoDart for Vec<T> where T: DartTypedDataTypeTrait {
     fn into_dart(self) -> DartCObject {
-        vec_8bit_to_dart(self, DartTypedDataType::Uint8)
+        let mut vec = ManuallyDrop::new(vec);
+        let data = DartNativeTypedData {
+            ty: T::dart_typed_data_type(),
+            length: vec.len() as isize,
+            values: vec.as_mut_ptr() as *mut _,
+        };
+        DartCObject {
+            ty: DartCObjectType::DartTypedData,
+            value: DartCObjectValue {
+                as_typed_data: data,
+            },
+        }
     }
 }
 
-impl IntoDart for Vec<i8> {
-    fn into_dart(self) -> DartCObject {
-        vec_8bit_to_dart(self, DartTypedDataType::Int8)
-    }
-}
-
-impl IntoDart for ZeroCopyBuffer<Vec<u8>> {
+impl<T> IntoDart for ZeroCopyBuffer<Vec<T>> where T: DartTypedDataTypeTrait {
     fn into_dart(self) -> DartCObject {
         let mut vec = ManuallyDrop::new(self.0);
         vec.shrink_to_fit();
@@ -140,11 +185,11 @@ impl IntoDart for ZeroCopyBuffer<Vec<u8>> {
             ty: DartCObjectType::DartExternalTypedData,
             value: DartCObjectValue {
                 as_external_typed_data: DartNativeExternalTypedData {
-                    ty: DartTypedDataType::Uint8,
+                    ty: T::dart_typed_data_type(),
                     length: length as isize,
                     data: ptr,
                     peer: ptr,
-                    callback: deallocate_rust_zero_copy_buffer,
+                    callback: T::deallocate_rust_zero_copy_buffer,
                 },
             },
         }
