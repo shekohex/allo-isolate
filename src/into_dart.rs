@@ -17,13 +17,8 @@ pub trait IntoDart {
     fn into_dart(self) -> DartCObject;
 }
 
-/// This is a separate trait. Types such as [`Vec<i32>`] will become
-/// [`List<int>`] using [IntoDart] and become [`Int32List`] when using
-/// [IntoDartTypedData]
-pub trait IntoDartTypedData {
-    /// Consumes `Self` and Performs the conversion.
-    fn into_dart_typed_data(self) -> DartCObject;
-}
+pub trait IntoDartExceptPrimitive: IntoDart {}
+pub trait IntoDartCustom: IntoDart {}
 
 impl<T> IntoDart for T
 where
@@ -130,6 +125,23 @@ macro_rules! dart_typed_data_type_trait_impl {
                 }
             }
 
+            impl IntoDart for Vec<$rust_type> {
+                fn into_dart(self) -> DartCObject {
+                    let mut vec = ManuallyDrop::new(self);
+                    let data = DartNativeTypedData {
+                        ty: $rust_type::dart_typed_data_type(),
+                        length: vec.len() as isize,
+                        values: vec.as_mut_ptr() as *mut _,
+                    };
+                    DartCObject {
+                        ty: DartCObjectType::DartTypedData,
+                        value: DartCObjectValue {
+                            as_typed_data: data,
+                        },
+                    }
+                }
+            }
+
             #[doc(hidden)]
             #[no_mangle]
             unsafe extern "C" fn $free_zero_copy_buffer_func(
@@ -166,26 +178,6 @@ dart_typed_data_type_trait_impl!(
     DartTypedDataType::Float64 => f64 + free_zero_copy_buffer_f64
 );
 
-impl<T> IntoDartTypedData for Vec<T>
-where
-    T: DartTypedDataTypeTrait,
-{
-    fn into_dart_typed_data(self) -> DartCObject {
-        let mut vec = ManuallyDrop::new(self);
-        let data = DartNativeTypedData {
-            ty: T::dart_typed_data_type(),
-            length: vec.len() as isize,
-            values: vec.as_mut_ptr() as *mut _,
-        };
-        DartCObject {
-            ty: DartCObjectType::DartTypedData,
-            value: DartCObjectValue {
-                as_typed_data: data,
-            },
-        }
-    }
-}
-
 impl<T> IntoDart for ZeroCopyBuffer<Vec<T>>
 where
     T: DartTypedDataTypeTrait,
@@ -212,16 +204,16 @@ where
     }
 }
 
-impl<T> IntoDartTypedData for ZeroCopyBuffer<Vec<T>>
-where
-    T: DartTypedDataTypeTrait,
+impl<T> IntoDart for Vec<T>
+    where
+        T: IntoDartExceptPrimitive,
 {
-    fn into_dart_typed_data(self) -> DartCObject { self.into_dart() }
+    fn into_dart(self) -> DartCObject { DartArray::from(self).into_dart() }
 }
 
 impl<T> IntoDart for Vec<T>
-where
-    T: IntoDart,
+    where
+        T: IntoDartCustom,
 {
     fn into_dart(self) -> DartCObject { DartArray::from(self).into_dart() }
 }
