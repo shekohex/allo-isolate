@@ -18,7 +18,6 @@ pub trait IntoDart {
 }
 
 pub trait IntoDartExceptPrimitive: IntoDart {}
-pub trait IntoDartCustom: IntoDart {}
 
 impl<T> IntoDart for T
 where
@@ -26,6 +25,8 @@ where
 {
     fn into_dart(self) -> DartCObject { self.into() }
 }
+
+impl<T> IntoDartExceptPrimitive for T where T: IntoDart + Into<DartCObject> {}
 
 impl IntoDart for () {
     fn into_dart(self) -> DartCObject {
@@ -86,9 +87,13 @@ impl IntoDart for String {
     }
 }
 
+impl IntoDartExceptPrimitive for String {}
+
 impl IntoDart for &'_ str {
     fn into_dart(self) -> DartCObject { self.to_string().into_dart() }
 }
+
+impl IntoDartExceptPrimitive for &'_ str {}
 
 impl IntoDart for CString {
     fn into_dart(self) -> DartCObject {
@@ -100,6 +105,8 @@ impl IntoDart for CString {
         }
     }
 }
+
+impl IntoDartExceptPrimitive for CString {}
 
 pub(crate) trait DartTypedDataTypeVisitor {
     fn visit<T: DartTypedDataTypeTrait>(&self);
@@ -204,16 +211,14 @@ where
     }
 }
 
-impl<T> IntoDart for Vec<T>
-    where
-        T: IntoDartExceptPrimitive,
+impl<T> IntoDartExceptPrimitive for ZeroCopyBuffer<Vec<T>> where
+    T: DartTypedDataTypeTrait
 {
-    fn into_dart(self) -> DartCObject { DartArray::from(self).into_dart() }
 }
 
 impl<T> IntoDart for Vec<T>
-    where
-        T: IntoDartCustom,
+where
+    T: IntoDartExceptPrimitive,
 {
     fn into_dart(self) -> DartCObject { DartArray::from(self).into_dart() }
 }
@@ -230,6 +235,8 @@ where
     }
 }
 
+impl<T> IntoDartExceptPrimitive for Option<T> where T: IntoDart {}
+
 impl<T, E> IntoDart for Result<T, E>
 where
     T: IntoDart,
@@ -241,6 +248,13 @@ where
             Err(e) => e.to_string().into_dart(),
         }
     }
+}
+
+impl<T, E> IntoDartExceptPrimitive for Result<T, E>
+where
+    T: IntoDart,
+    E: ToString,
+{
 }
 
 /// A workaround to send raw pointers to dart over the port.
