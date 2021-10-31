@@ -208,71 +208,119 @@ impl VMIsolate {
                     cb(v.length as *mut c_void, v.peer);
                 }
 
-                unsafe {
-                    match ty {
-                        DartTypedDataType::Int8 => {
-                            let _ = from_buf_raw(
+                match ty {
+                    DartTypedDataType::Int8 => {
+                        let _ = unsafe {
+                            let output = from_buf_raw(
                                 v.data as *mut i8,
                                 v.length as usize,
                             );
-                        },
-                        DartTypedDataType::Uint8 => {
-                            let _ = from_buf_raw(
+                            let cb = v.callback;
+                            cb(v.length as *mut c_void, v.peer);
+                            output
+                        };
+                    },
+                    DartTypedDataType::Uint8 => {
+                        let _ = unsafe {
+                            let output = from_buf_raw(
                                 v.data as *mut u8,
                                 v.length as usize,
                             );
-                        },
-                        DartTypedDataType::Int16 => {
-                            let _ = from_buf_raw(
+                            let cb = v.callback;
+                            cb(v.length as *mut c_void, v.peer);
+                            output
+                        };
+                    },
+                    DartTypedDataType::Int16 => {
+                        let _ = unsafe {
+                            let output = from_buf_raw(
                                 v.data as *mut i16,
                                 v.length as usize,
                             );
-                        },
-                        DartTypedDataType::Uint16 => {
-                            let _ = from_buf_raw(
+                            let cb = v.callback;
+                            cb(v.length as *mut c_void, v.peer);
+                            output
+                        };
+                    },
+                    DartTypedDataType::Uint16 => {
+                        let _ = unsafe {
+                            let output = from_buf_raw(
                                 v.data as *mut u16,
                                 v.length as usize,
                             );
-                        },
-                        DartTypedDataType::Int32 => {
-                            let _ = from_buf_raw(
+                            let cb = v.callback;
+                            cb(v.length as *mut c_void, v.peer);
+                            output
+                        };
+                    },
+                    DartTypedDataType::Int32 => {
+                        let _ = unsafe {
+                            let output = from_buf_raw(
                                 v.data as *mut i32,
                                 v.length as usize,
                             );
-                        },
-                        DartTypedDataType::Uint32 => {
-                            let _ = from_buf_raw(
+                            let cb = v.callback;
+                            cb(v.length as *mut c_void, v.peer);
+                            output
+                        };
+                    },
+                    DartTypedDataType::Uint32 => {
+                        let _ = unsafe {
+                            let output = from_buf_raw(
                                 v.data as *mut u32,
                                 v.length as usize,
                             );
-                        },
-                        DartTypedDataType::Int64 => {
-                            let _ = from_buf_raw(
+                            let cb = v.callback;
+                            cb(v.length as *mut c_void, v.peer);
+                            output
+                        };
+                    },
+                    DartTypedDataType::Int64 => {
+                        let _ = unsafe {
+                            let output = from_buf_raw(
                                 v.data as *mut i64,
                                 v.length as usize,
                             );
-                        },
-                        DartTypedDataType::Uint64 => {
-                            let _ = from_buf_raw(
+                            let cb = v.callback;
+                            cb(v.length as *mut c_void, v.peer);
+                            output
+                        };
+                    },
+                    DartTypedDataType::Uint64 => {
+                        let _ = unsafe {
+                            let output = from_buf_raw(
                                 v.data as *mut u64,
                                 v.length as usize,
                             );
-                        },
-                        DartTypedDataType::Float32 => {
-                            let _ = from_buf_raw(
+                            let cb = v.callback;
+                            cb(v.length as *mut c_void, v.peer);
+                            output
+                        };
+                    },
+                    DartTypedDataType::Float32 => {
+                        let _ = unsafe {
+                            let output = from_buf_raw(
                                 v.data as *mut f32,
                                 v.length as usize,
                             );
-                        },
-                        DartTypedDataType::Float64 => {
-                            let _ = from_buf_raw(
+                            let cb = v.callback;
+                            cb(v.length as *mut c_void, v.peer);
+                            output
+                        };
+                    },
+                    DartTypedDataType::Float64 => {
+                        let _ = unsafe {
+                            let output = from_buf_raw(
                                 v.data as *mut f64,
                                 v.length as usize,
                             );
-                        },
-                        _ => unimplemented!(),
-                    };
-                }
+                            let cb = v.callback;
+                            cb(v.length as *mut c_void, v.peer);
+                            output
+                        };
+                    },
+                    _ => unimplemented!(),
+                };
             },
             _ => {
                 unimplemented!();
