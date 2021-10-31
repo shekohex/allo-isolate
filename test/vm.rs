@@ -133,37 +133,84 @@ impl VMIsolate {
             DartTypedData => {
                 let v = unsafe { o.value.as_typed_data };
                 let ty = v.ty;
-                match ty {
-                    DartTypedDataType::Int8 => {
-                        let _ = unsafe {
-                            from_buf_raw(v.values as *mut i8, v.length as usize)
-                        };
-                    },
-                    DartTypedDataType::Uint8 => {
-                        let _ = unsafe {
-                            from_buf_raw(v.values as *mut u8, v.length as usize)
-                        };
-                    },
-                    _ => unimplemented!(),
-                };
+                unsafe {
+                    match ty {
+                        DartTypedDataType::Int8 => {
+                            let _ = from_buf_raw(v.values as *mut i8, v.length as usize);
+                        },
+                        DartTypedDataType::Uint8 => {
+                            let _ = from_buf_raw(v.values as *mut u8, v.length as usize);
+                        },
+                        DartTypedDataType::Int16 => {
+                            let _ = from_buf_raw(v.values as *mut i16, v.length as usize);
+                        },
+                        DartTypedDataType::Uint16 => {
+                            let _ = from_buf_raw(v.values as *mut u16, v.length as usize);
+                        },
+                        DartTypedDataType::Int32 => {
+                            let _ = from_buf_raw(v.values as *mut i32, v.length as usize);
+                        },
+                        DartTypedDataType::Uint32 => {
+                            let _ = from_buf_raw(v.values as *mut u32, v.length as usize);
+                        },
+                        DartTypedDataType::Int64 => {
+                            let _ = from_buf_raw(v.values as *mut i64, v.length as usize);
+                        },
+                        DartTypedDataType::Uint64 => {
+                            let _ = from_buf_raw(v.values as *mut u64, v.length as usize);
+                        },
+                        DartTypedDataType::Float32 => {
+                            let _ = from_buf_raw(v.values as *mut f32, v.length as usize);
+                        },
+                        DartTypedDataType::Float64 => {
+                            let _ = from_buf_raw(v.values as *mut f64, v.length as usize);
+                        },
+                        _ => unimplemented!(),
+                    };
+                }
             },
             DartExternalTypedData => {
                 let v = unsafe { o.value.as_external_typed_data };
                 let ty = v.ty;
-                match ty {
-                    DartTypedDataType::Uint8 => {
-                        let _ = unsafe {
-                            let output = from_buf_raw(
-                                v.data as *mut u8,
-                                v.length as usize,
-                            );
-                            let cb = v.callback;
-                            cb(v.length as *mut c_void, v.peer);
-                            output
-                        };
-                    },
-                    _ => unimplemented!(),
-                };
+
+                let cb = v.callback;
+                cb(v.length as *mut c_void, v.peer);
+
+                unsafe{
+                    match ty {
+                        DartTypedDataType::Int8 => {
+                            let _ = from_buf_raw(v.values as *mut i8, v.length as usize);
+                        },
+                        DartTypedDataType::Uint8 => {
+                            let _ = from_buf_raw(v.values as *mut u8, v.length as usize);
+                        },
+                        DartTypedDataType::Int16 => {
+                            let _ = from_buf_raw(v.values as *mut i16, v.length as usize);
+                        },
+                        DartTypedDataType::Uint16 => {
+                            let _ = from_buf_raw(v.values as *mut u16, v.length as usize);
+                        },
+                        DartTypedDataType::Int32 => {
+                            let _ = from_buf_raw(v.values as *mut i32, v.length as usize);
+                        },
+                        DartTypedDataType::Uint32 => {
+                            let _ = from_buf_raw(v.values as *mut u32, v.length as usize);
+                        },
+                        DartTypedDataType::Int64 => {
+                            let _ = from_buf_raw(v.values as *mut i64, v.length as usize);
+                        },
+                        DartTypedDataType::Uint64 => {
+                            let _ = from_buf_raw(v.values as *mut u64, v.length as usize);
+                        },
+                        DartTypedDataType::Float32 => {
+                            let _ = from_buf_raw(v.values as *mut f32, v.length as usize);
+                        },
+                        DartTypedDataType::Float64 => {
+                            let _ = from_buf_raw(v.values as *mut f64, v.length as usize);
+                        },
+                        _ => unimplemented!(),
+                    };
+                }
             },
             _ => {
                 unimplemented!();
