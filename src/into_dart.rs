@@ -108,7 +108,7 @@ pub(crate) trait DartTypedDataTypeVisitor {
 }
 
 /// The Rust type for corresponding [DartTypedDataType]
-pub(crate) trait DartTypedDataTypeTrait {
+pub trait DartTypedDataTypeTrait {
     fn dart_typed_data_type() -> DartTypedDataType;
 
     unsafe extern "C" fn deallocate_rust_zero_copy_buffer(
@@ -143,6 +143,7 @@ macro_rules! dart_typed_data_type_trait_impl {
                 $(
                     $dart_type => visitor.visit::<$rust_type>(),
                 )+
+                _ => panic!("visit_dart_typed_data_type see unexpected DartTypedDataType={:?}", ty)
             }
         }
     }
@@ -198,8 +199,8 @@ where
                 as_external_typed_data: DartNativeExternalTypedData {
                     ty: T::dart_typed_data_type(),
                     length: length as isize,
-                    data: ptr,
-                    peer: ptr,
+                    data: ptr as *mut u8,
+                    peer: ptr as *mut c_void,
                     callback: T::deallocate_rust_zero_copy_buffer,
                 },
             },
