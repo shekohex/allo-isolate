@@ -11,6 +11,7 @@ use crate::{
     dart_array::DartArray,
     into_dart::{DartTypedDataTypeTrait, DartTypedDataTypeVisitor},
 };
+use crate::into_dart::visit_dart_typed_data_type;
 
 /// A port is used to send or receive inter-isolate messages
 pub type DartPort = i64;
@@ -182,7 +183,7 @@ impl Drop for DartCObject {
                 }
 
                 let v = unsafe { self.value.as_typed_data };
-                visit_dart_typed_data_type(v.ty, MyVisitor(&v));
+                visit_dart_typed_data_type(v.ty, &MyVisitor(&v));
             },
             // write out all cases in order to be explicit - we do not want to
             // leak any memory

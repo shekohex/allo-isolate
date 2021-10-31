@@ -110,31 +110,31 @@ pub(crate) trait DartTypedDataTypeTrait {
 }
 
 macro_rules! dart_typed_data_type_trait_impl {
-    ($($dart_type:expr => $rust_type:ident),+) => {
+    ($($dart_type:path => $rust_type:ident),+) => {
         $(
             impl DartTypedDataTypeTrait for $rust_type {
                 fn dart_typed_data_type() -> DartTypedDataType {
                     $dart_type
                 }
-            }
 
-            #[doc(hidden)]
-            #[no_mangle]
-            unsafe extern "C" fn deallocate_rust_zero_copy_buffer(
-                isolate_callback_data: *mut c_void,
-                peer: *mut c_void,
-            ) {
-                let len = (isolate_callback_data as isize) as usize;
-                let ptr = peer as *mut $rust_type;
-                drop(Vec::from_raw_parts(ptr, len, len));
+                #[doc(hidden)]
+                #[no_mangle]
+                unsafe extern "C" fn deallocate_rust_zero_copy_buffer(
+                    isolate_callback_data: *mut c_void,
+                    peer: *mut c_void,
+                ) {
+                    let len = (isolate_callback_data as isize) as usize;
+                    let ptr = peer as *mut $rust_type;
+                    drop(Vec::from_raw_parts(ptr, len, len));
+                }
             }
-        ),+
+        )+
 
         pub(crate) fn visit_dart_typed_data_type<V: DartTypedDataTypeVisitor>(ty: DartTypedDataType, visitor: &V) {
             match ty {
                 $(
                     $dart_type => visitor.visit::<$rust_type>(),
-                ),+
+                )+
             }
         }
     }
@@ -150,7 +150,7 @@ dart_typed_data_type_trait_impl!(
     DartTypedDataType::Int64 => i64,
     DartTypedDataType::Uint64 => u64,
     DartTypedDataType::Float32 => f32,
-    DartTypedDataType::Float64 => f64,
+    DartTypedDataType::Float64 => f64
 );
 
 impl<T> IntoDart for Vec<T>
@@ -158,7 +158,7 @@ where
     T: DartTypedDataTypeTrait,
 {
     fn into_dart(self) -> DartCObject {
-        let mut vec = ManuallyDrop::new(vec);
+        let mut vec = ManuallyDrop::new(self);
         let data = DartNativeTypedData {
             ty: T::dart_typed_data_type(),
             length: vec.len() as isize,
