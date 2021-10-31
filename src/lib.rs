@@ -29,7 +29,7 @@ use atomic::Atomic;
 use std::{future::Future, sync::atomic::Ordering};
 
 pub use ffi::ZeroCopyBuffer;
-pub use into_dart::IntoDart;
+pub use into_dart::{IntoDart, IntoDartTypedData};
 
 mod dart_array;
 mod into_dart;

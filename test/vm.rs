@@ -5,7 +5,11 @@ use allo_isolate::{
     },
     IntoDart,
 };
-use std::{collections::HashMap, ffi::CStr, sync::Mutex};
+use std::{
+    collections::HashMap,
+    ffi::{c_void, CStr},
+    sync::Mutex,
+};
 
 thread_local! {
   static DART_VM: DartVM = DartVM::new();
@@ -154,7 +158,7 @@ impl VMIsolate {
                                 v.length as usize,
                             );
                             let cb = v.callback;
-                            cb(v.length, v.peer);
+                            cb(v.length as *mut c_void, v.peer);
                             output
                         };
                     },

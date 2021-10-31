@@ -1,4 +1,4 @@
-use allo_isolate::{Isolate, ZeroCopyBuffer};
+use allo_isolate::{IntoDartTypedData, Isolate, ZeroCopyBuffer};
 
 mod vm;
 
@@ -32,17 +32,16 @@ fn main() {
 
     assert!(isolate.post(vec![String::from("Rust"); 8]));
     assert!(isolate.post(vec![String::from("Dart"); 1024]));
-    assert!(isolate.post(vec![42i8; 100]));
-    assert!(isolate.post(vec![42u8; 100]));
-    assert!(isolate.post(vec![42i16; 100]));
-    assert!(isolate.post(vec![42u16; 100]));
-    assert!(isolate.post(vec![42i32; 100]));
-    assert!(isolate.post(vec![42u32; 100]));
-    assert!(isolate.post(vec![42i64; 100]));
-    assert!(isolate.post(vec![42u64; 100]));
-    assert!(isolate.post(vec![42.0f32; 100]));
-    assert!(isolate.post(vec![42.0f64; 100]));
-    assert!(isolate.post(vec![42u128; 100]));
+    assert!(isolate.post(vec![42i8; 100].into_dart_typed_data()));
+    assert!(isolate.post(vec![42u8; 100].into_dart_typed_data()));
+    assert!(isolate.post(vec![42i16; 100].into_dart_typed_data()));
+    assert!(isolate.post(vec![42u16; 100].into_dart_typed_data()));
+    assert!(isolate.post(vec![42i32; 100].into_dart_typed_data()));
+    assert!(isolate.post(vec![42u32; 100].into_dart_typed_data()));
+    assert!(isolate.post(vec![42i64; 100].into_dart_typed_data()));
+    assert!(isolate.post(vec![42u64; 100].into_dart_typed_data()));
+    assert!(isolate.post(vec![42.0f32; 100].into_dart_typed_data()));
+    assert!(isolate.post(vec![42.0f64; 100].into_dart_typed_data()));
     assert!(isolate.post(ZeroCopyBuffer(vec![42i8; 100])));
     assert!(isolate.post(ZeroCopyBuffer(vec![42u8; 100])));
     assert!(isolate.post(ZeroCopyBuffer(vec![42i16; 100])));

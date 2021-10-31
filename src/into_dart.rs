@@ -3,8 +3,10 @@ use std::{
     mem::ManuallyDrop,
 };
 
-use crate::{dart_array::DartArray, ffi::*};
-use crate::ffi::DartHandleFinalizer;
+use crate::{
+    dart_array::DartArray,
+    ffi::{DartHandleFinalizer, *},
+};
 
 /// A trait to convert between Rust types and Dart Types that could then
 /// be sent to the isolate
