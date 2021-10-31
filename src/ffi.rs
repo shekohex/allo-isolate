@@ -9,9 +9,11 @@ use DartCObjectType::*;
 
 use crate::{
     dart_array::DartArray,
-    into_dart::{DartTypedDataTypeTrait, DartTypedDataTypeVisitor},
+    into_dart::{
+        visit_dart_typed_data_type, DartTypedDataTypeTrait,
+        DartTypedDataTypeVisitor,
+    },
 };
-use crate::into_dart::visit_dart_typed_data_type;
 
 /// A port is used to send or receive inter-isolate messages
 pub type DartPort = i64;

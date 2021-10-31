@@ -14,6 +14,14 @@ pub trait IntoDart {
     fn into_dart(self) -> DartCObject;
 }
 
+/// This is a separate trait. Types such as [`Vec<i32>`] will become
+/// [`List<int>`] using [IntoDart] and become [`Int32List`] when using
+/// [IntoDartTypedData]
+pub trait IntoDartTypedData {
+    /// Consumes `Self` and Performs the conversion.
+    fn into_dart_typed_data(self) -> DartCObject;
+}
+
 impl<T> IntoDart for T
 where
     T: Into<DartCObject>,
@@ -153,11 +161,11 @@ dart_typed_data_type_trait_impl!(
     DartTypedDataType::Float64 => f64
 );
 
-impl<T> IntoDart for Vec<T>
+impl<T> IntoDartTypedData for Vec<T>
 where
     T: DartTypedDataTypeTrait,
 {
-    fn into_dart(self) -> DartCObject {
+    fn into_dart_typed_data(self) -> DartCObject {
         let mut vec = ManuallyDrop::new(self);
         let data = DartNativeTypedData {
             ty: T::dart_typed_data_type(),
@@ -197,6 +205,13 @@ where
             },
         }
     }
+}
+
+impl<T> IntoDartTypedData for ZeroCopyBuffer<Vec<T>>
+where
+    T: DartTypedDataTypeTrait,
+{
+    fn into_dart_typed_data(self) -> DartCObject { self.into_dart() }
 }
 
 impl<T> IntoDart for Vec<T>
