@@ -17,9 +17,9 @@ pub trait IntoDart {
     fn into_dart(self) -> DartCObject;
 }
 
-/// A trait that is [`IntoDart`] and is also not a primitive type. It is used to avoid
-/// the ambiguity of whether types such as [`Vec<i32>`] should be converted into [`Int32List`]
-/// or [`List<int>`]
+/// A trait that is [`IntoDart`] and is also not a primitive type. It is used to
+/// avoid the ambiguity of whether types such as [`Vec<i32>`] should be
+/// converted into [`Int32List`] or [`List<int>`]
 pub trait IntoDartExceptPrimitive: IntoDart {}
 
 impl<T> IntoDart for T
