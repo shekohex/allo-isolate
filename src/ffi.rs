@@ -137,7 +137,7 @@ pub struct DartNativeExternalTypedData {
 }
 
 /// https://github.com/dart-lang/sdk/blob/main/runtime/include/dart_api.h
-type DartHandleFinalizer =
+pub type DartHandleFinalizer =
     unsafe extern "C" fn(isolate_callback_data: *mut c_void, peer: *mut c_void);
 
 /// Wrapping a Vec<u8> in this tuple struct will allow into_dart()

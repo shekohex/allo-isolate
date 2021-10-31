@@ -4,6 +4,7 @@ use std::{
 };
 
 use crate::{dart_array::DartArray, ffi::*};
+use crate::ffi::DartHandleFinalizer;
 
 /// A trait to convert between Rust types and Dart Types that could then
 /// be sent to the isolate
@@ -111,30 +112,31 @@ pub(crate) trait DartTypedDataTypeVisitor {
 pub trait DartTypedDataTypeTrait {
     fn dart_typed_data_type() -> DartTypedDataType;
 
-    unsafe extern "C" fn deallocate_rust_zero_copy_buffer(
-        isolate_callback_data: *mut c_void,
-        peer: *mut c_void,
-    );
+    fn function_pointer_of_free_zero_copy_buffer() -> DartHandleFinalizer;
 }
 
 macro_rules! dart_typed_data_type_trait_impl {
-    ($($dart_type:path => $rust_type:ident),+) => {
+    ($($dart_type:path => $rust_type:ident + $free_zero_copy_buffer_func:ident),+) => {
         $(
             impl DartTypedDataTypeTrait for $rust_type {
                 fn dart_typed_data_type() -> DartTypedDataType {
                     $dart_type
                 }
 
-                #[doc(hidden)]
-                #[no_mangle]
-                unsafe extern "C" fn deallocate_rust_zero_copy_buffer(
-                    isolate_callback_data: *mut c_void,
-                    peer: *mut c_void,
-                ) {
-                    let len = (isolate_callback_data as isize) as usize;
-                    let ptr = peer as *mut $rust_type;
-                    drop(Vec::from_raw_parts(ptr, len, len));
+                fn function_pointer_of_free_zero_copy_buffer() -> DartHandleFinalizer {
+                    $free_zero_copy_buffer_func
                 }
+            }
+
+            #[doc(hidden)]
+            #[no_mangle]
+            unsafe extern "C" fn $free_zero_copy_buffer_func(
+                isolate_callback_data: *mut c_void,
+                peer: *mut c_void,
+            ) {
+                let len = (isolate_callback_data as isize) as usize;
+                let ptr = peer as *mut $rust_type;
+                drop(Vec::from_raw_parts(ptr, len, len));
             }
         )+
 
@@ -150,16 +152,16 @@ macro_rules! dart_typed_data_type_trait_impl {
 }
 
 dart_typed_data_type_trait_impl!(
-    DartTypedDataType::Int8 => i8,
-    DartTypedDataType::Uint8 => u8,
-    DartTypedDataType::Int16 => i16,
-    DartTypedDataType::Uint16 => u16,
-    DartTypedDataType::Int32 => i32,
-    DartTypedDataType::Uint32 => u32,
-    DartTypedDataType::Int64 => i64,
-    DartTypedDataType::Uint64 => u64,
-    DartTypedDataType::Float32 => f32,
-    DartTypedDataType::Float64 => f64
+    DartTypedDataType::Int8 => i8 + free_zero_copy_buffer_i8,
+    DartTypedDataType::Uint8 => u8 + free_zero_copy_buffer_u8,
+    DartTypedDataType::Int16 => i16 + free_zero_copy_buffer_i16,
+    DartTypedDataType::Uint16 => u16 + free_zero_copy_buffer_u16,
+    DartTypedDataType::Int32 => i32 + free_zero_copy_buffer_i32,
+    DartTypedDataType::Uint32 => u32 + free_zero_copy_buffer_u32,
+    DartTypedDataType::Int64 => i64 + free_zero_copy_buffer_i64,
+    DartTypedDataType::Uint64 => u64 + free_zero_copy_buffer_u64,
+    DartTypedDataType::Float32 => f32 + free_zero_copy_buffer_f32,
+    DartTypedDataType::Float64 => f64 + free_zero_copy_buffer_f64
 );
 
 impl<T> IntoDartTypedData for Vec<T>
@@ -201,7 +203,7 @@ where
                     length: length as isize,
                     data: ptr as *mut u8,
                     peer: ptr as *mut c_void,
-                    callback: T::deallocate_rust_zero_copy_buffer,
+                    callback: T::function_pointer_of_free_zero_copy_buffer(),
                 },
             },
         }
