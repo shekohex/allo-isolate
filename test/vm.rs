@@ -203,11 +203,6 @@ impl VMIsolate {
                 let v = unsafe { o.value.as_external_typed_data };
                 let ty = v.ty;
 
-                let cb = v.callback;
-                unsafe {
-                    cb(v.length as *mut c_void, v.peer);
-                }
-
                 match ty {
                     DartTypedDataType::Int8 => {
                         let _ = unsafe {
