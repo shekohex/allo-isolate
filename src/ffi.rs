@@ -1,12 +1,16 @@
 #![allow(missing_docs)]
 
-use std::{ffi::CString, os::raw};
-use std::ffi::c_void;
+use std::{
+    ffi::{c_void, CString},
+    os::raw,
+};
 
 use DartCObjectType::*;
 
-use crate::dart_array::DartArray;
-use crate::into_dart::{DartTypedDataTypeTrait, DartTypedDataTypeVisitor};
+use crate::{
+    dart_array::DartArray,
+    into_dart::{DartTypedDataTypeTrait, DartTypedDataTypeVisitor},
+};
 
 /// A port is used to send or receive inter-isolate messages
 pub type DartPort = i64;
@@ -130,7 +134,8 @@ pub struct DartNativeExternalTypedData {
 }
 
 /// https://github.com/dart-lang/sdk/blob/main/runtime/include/dart_api.h
-type DartHandleFinalizer = unsafe extern "C" fn(isolate_callback_data: *mut c_void, peer: *mut c_void);
+type DartHandleFinalizer =
+    unsafe extern "C" fn(isolate_callback_data: *mut c_void, peer: *mut c_void);
 
 /// Wrapping a Vec<u8> in this tuple struct will allow into_dart()
 /// to send it as a DartNativeExternalTypedData buffer with no copy overhead

@@ -1,4 +1,7 @@
-use std::{ffi::CString, mem::ManuallyDrop, ffi::c_void};
+use std::{
+    ffi::{c_void, CString},
+    mem::ManuallyDrop,
+};
 
 use crate::{dart_array::DartArray, ffi::*};
 
@@ -15,9 +18,7 @@ impl<T> IntoDart for T
 where
     T: Into<DartCObject>,
 {
-    fn into_dart(self) -> DartCObject {
-        self.into()
-    }
+    fn into_dart(self) -> DartCObject { self.into() }
 }
 
 impl IntoDart for () {
@@ -51,9 +52,7 @@ impl IntoDart for i64 {
 }
 
 impl IntoDart for f32 {
-    fn into_dart(self) -> DartCObject {
-        (self as f64).into_dart()
-    }
+    fn into_dart(self) -> DartCObject { (self as f64).into_dart() }
 }
 
 impl IntoDart for f64 {
@@ -82,9 +81,7 @@ impl IntoDart for String {
 }
 
 impl IntoDart for &'_ str {
-    fn into_dart(self) -> DartCObject {
-        self.to_string().into_dart()
-    }
+    fn into_dart(self) -> DartCObject { self.to_string().into_dart() }
 }
 
 impl IntoDart for CString {
@@ -156,7 +153,10 @@ dart_typed_data_type_trait_impl!(
     DartTypedDataType::Float64 => f64,
 );
 
-impl<T> IntoDart for Vec<T> where T: DartTypedDataTypeTrait {
+impl<T> IntoDart for Vec<T>
+where
+    T: DartTypedDataTypeTrait,
+{
     fn into_dart(self) -> DartCObject {
         let mut vec = ManuallyDrop::new(vec);
         let data = DartNativeTypedData {
@@ -173,7 +173,10 @@ impl<T> IntoDart for Vec<T> where T: DartTypedDataTypeTrait {
     }
 }
 
-impl<T> IntoDart for ZeroCopyBuffer<Vec<T>> where T: DartTypedDataTypeTrait {
+impl<T> IntoDart for ZeroCopyBuffer<Vec<T>>
+where
+    T: DartTypedDataTypeTrait,
+{
     fn into_dart(self) -> DartCObject {
         let mut vec = ManuallyDrop::new(self.0);
         vec.shrink_to_fit();
