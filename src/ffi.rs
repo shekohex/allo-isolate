@@ -45,6 +45,8 @@ pub enum DartTypedDataType {
 /// message send and returned when the VM invokes the
 /// Dart_WeakPersistentHandleFinalizer callback; a non-NULL callback must be
 /// provided.
+///
+/// https://github.com/dart-lang/sdk/blob/main/runtime/include/dart_native_api.h
 #[repr(i32)]
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum DartCObjectType {
@@ -111,7 +113,7 @@ pub struct DartNativeArray {
 #[derive(Debug, Copy, Clone)]
 pub struct DartNativeTypedData {
     pub ty: DartTypedDataType,
-    pub length: isize,
+    pub length: isize, // in elements, not bytes
     pub values: *mut u8,
 }
 
@@ -119,7 +121,7 @@ pub struct DartNativeTypedData {
 #[derive(Debug, Copy, Clone)]
 pub struct DartNativeExternalTypedData {
     pub ty: DartTypedDataType,
-    pub length: isize,
+    pub length: isize, // in elements, not bytes
     pub data: *mut u8,
     pub peer: *mut u8,
     pub callback: unsafe extern "C" fn(isize, *mut u8),
