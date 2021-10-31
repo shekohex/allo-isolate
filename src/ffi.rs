@@ -1,6 +1,7 @@
 #![allow(missing_docs)]
 
 use std::{ffi::CString, os::raw};
+use std::ffi::c_void;
 
 use DartCObjectType::*;
 
@@ -123,9 +124,12 @@ pub struct DartNativeExternalTypedData {
     pub ty: DartTypedDataType,
     pub length: isize, // in elements, not bytes
     pub data: *mut u8,
-    pub peer: *mut u8,
-    pub callback: unsafe extern "C" fn(isize, *mut u8),
+    pub peer: *mut c_void,
+    pub callback: DartHandleFinalizer,
 }
+
+/// https://github.com/dart-lang/sdk/blob/main/runtime/include/dart_api.h
+type DartHandleFinalizer = unsafe extern "C" fn(isolate_callback_data: *mut c_void, peer: *mut c_void);
 
 /// Wrapping a Vec<u8> in this tuple struct will allow into_dart()
 /// to send it as a DartNativeExternalTypedData buffer with no copy overhead
