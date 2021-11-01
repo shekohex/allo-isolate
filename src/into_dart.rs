@@ -1,6 +1,12 @@
-use std::{ffi::CString, mem::ManuallyDrop};
+use std::{
+    ffi::{c_void, CString},
+    mem::ManuallyDrop,
+};
 
-use crate::{dart_array::DartArray, ffi::*};
+use crate::{
+    dart_array::DartArray,
+    ffi::{DartHandleFinalizer, *},
+};
 
 /// A trait to convert between Rust types and Dart Types that could then
 /// be sent to the isolate
@@ -11,12 +17,19 @@ pub trait IntoDart {
     fn into_dart(self) -> DartCObject;
 }
 
+/// A trait that is [`IntoDart`] and is also not a primitive type. It is used to
+/// avoid the ambiguity of whether types such as [`Vec<i32>`] should be
+/// converted into [`Int32List`] or [`List<int>`]
+pub trait IntoDartExceptPrimitive: IntoDart {}
+
 impl<T> IntoDart for T
 where
     T: Into<DartCObject>,
 {
     fn into_dart(self) -> DartCObject { self.into() }
 }
+
+impl<T> IntoDartExceptPrimitive for T where T: IntoDart + Into<DartCObject> {}
 
 impl IntoDart for () {
     fn into_dart(self) -> DartCObject {
@@ -77,9 +90,13 @@ impl IntoDart for String {
     }
 }
 
+impl IntoDartExceptPrimitive for String {}
+
 impl IntoDart for &'_ str {
     fn into_dart(self) -> DartCObject { self.to_string().into_dart() }
 }
+
+impl IntoDartExceptPrimitive for &'_ str {}
 
 impl IntoDart for CString {
     fn into_dart(self) -> DartCObject {
@@ -92,43 +109,92 @@ impl IntoDart for CString {
     }
 }
 
-trait Num8Bit {}
+impl IntoDartExceptPrimitive for CString {}
 
-impl Num8Bit for u8 {}
+/// It is used when you want to write a generic function on different data types
+/// and do not want to repeat yourself dozens of times.
+/// For example, inside [Drop] of [DartCObject].
+pub(crate) trait DartTypedDataTypeVisitor {
+    fn visit<T: DartTypedDataTypeTrait>(&self);
+}
 
-impl Num8Bit for i8 {}
+/// The Rust type for corresponding [DartTypedDataType]
+pub trait DartTypedDataTypeTrait {
+    fn dart_typed_data_type() -> DartTypedDataType;
 
-fn vec_8bit_to_dart<T: Num8Bit>(
-    vec: Vec<T>,
-    ty: DartTypedDataType,
-) -> DartCObject {
-    let mut vec = ManuallyDrop::new(vec);
-    let data = DartNativeTypedData {
-        ty,
-        length: vec.len() as isize,
-        values: vec.as_mut_ptr() as *mut _,
-    };
-    DartCObject {
-        ty: DartCObjectType::DartTypedData,
-        value: DartCObjectValue {
-            as_typed_data: data,
-        },
+    fn function_pointer_of_free_zero_copy_buffer() -> DartHandleFinalizer;
+}
+
+macro_rules! dart_typed_data_type_trait_impl {
+    ($($dart_type:path => $rust_type:ident + $free_zero_copy_buffer_func:ident),+) => {
+        $(
+            impl DartTypedDataTypeTrait for $rust_type {
+                fn dart_typed_data_type() -> DartTypedDataType {
+                    $dart_type
+                }
+
+                fn function_pointer_of_free_zero_copy_buffer() -> DartHandleFinalizer {
+                    $free_zero_copy_buffer_func
+                }
+            }
+
+            impl IntoDart for Vec<$rust_type> {
+                fn into_dart(self) -> DartCObject {
+                    let mut vec = ManuallyDrop::new(self);
+                    let data = DartNativeTypedData {
+                        ty: $rust_type::dart_typed_data_type(),
+                        length: vec.len() as isize,
+                        values: vec.as_mut_ptr() as *mut _,
+                    };
+                    DartCObject {
+                        ty: DartCObjectType::DartTypedData,
+                        value: DartCObjectValue {
+                            as_typed_data: data,
+                        },
+                    }
+                }
+            }
+
+            #[doc(hidden)]
+            #[no_mangle]
+            unsafe extern "C" fn $free_zero_copy_buffer_func(
+                isolate_callback_data: *mut c_void,
+                peer: *mut c_void,
+            ) {
+                let len = (isolate_callback_data as isize) as usize;
+                let ptr = peer as *mut $rust_type;
+                drop(Vec::from_raw_parts(ptr, len, len));
+            }
+        )+
+
+        pub(crate) fn visit_dart_typed_data_type<V: DartTypedDataTypeVisitor>(ty: DartTypedDataType, visitor: &V) {
+            match ty {
+                $(
+                    $dart_type => visitor.visit::<$rust_type>(),
+                )+
+                _ => panic!("visit_dart_typed_data_type see unexpected DartTypedDataType={:?}", ty)
+            }
+        }
     }
 }
 
-impl IntoDart for Vec<u8> {
-    fn into_dart(self) -> DartCObject {
-        vec_8bit_to_dart(self, DartTypedDataType::Uint8)
-    }
-}
+dart_typed_data_type_trait_impl!(
+    DartTypedDataType::Int8 => i8 + free_zero_copy_buffer_i8,
+    DartTypedDataType::Uint8 => u8 + free_zero_copy_buffer_u8,
+    DartTypedDataType::Int16 => i16 + free_zero_copy_buffer_i16,
+    DartTypedDataType::Uint16 => u16 + free_zero_copy_buffer_u16,
+    DartTypedDataType::Int32 => i32 + free_zero_copy_buffer_i32,
+    DartTypedDataType::Uint32 => u32 + free_zero_copy_buffer_u32,
+    DartTypedDataType::Int64 => i64 + free_zero_copy_buffer_i64,
+    DartTypedDataType::Uint64 => u64 + free_zero_copy_buffer_u64,
+    DartTypedDataType::Float32 => f32 + free_zero_copy_buffer_f32,
+    DartTypedDataType::Float64 => f64 + free_zero_copy_buffer_f64
+);
 
-impl IntoDart for Vec<i8> {
-    fn into_dart(self) -> DartCObject {
-        vec_8bit_to_dart(self, DartTypedDataType::Int8)
-    }
-}
-
-impl IntoDart for ZeroCopyBuffer<Vec<u8>> {
+impl<T> IntoDart for ZeroCopyBuffer<Vec<T>>
+where
+    T: DartTypedDataTypeTrait,
+{
     fn into_dart(self) -> DartCObject {
         let mut vec = ManuallyDrop::new(self.0);
         vec.shrink_to_fit();
@@ -140,20 +206,25 @@ impl IntoDart for ZeroCopyBuffer<Vec<u8>> {
             ty: DartCObjectType::DartExternalTypedData,
             value: DartCObjectValue {
                 as_external_typed_data: DartNativeExternalTypedData {
-                    ty: DartTypedDataType::Uint8,
+                    ty: T::dart_typed_data_type(),
                     length: length as isize,
-                    data: ptr,
-                    peer: ptr,
-                    callback: deallocate_rust_zero_copy_buffer,
+                    data: ptr as *mut u8,
+                    peer: ptr as *mut c_void,
+                    callback: T::function_pointer_of_free_zero_copy_buffer(),
                 },
             },
         }
     }
 }
 
+impl<T> IntoDartExceptPrimitive for ZeroCopyBuffer<Vec<T>> where
+    T: DartTypedDataTypeTrait
+{
+}
+
 impl<T> IntoDart for Vec<T>
 where
-    T: IntoDart,
+    T: IntoDartExceptPrimitive,
 {
     fn into_dart(self) -> DartCObject { DartArray::from(self).into_dart() }
 }
@@ -170,6 +241,8 @@ where
     }
 }
 
+impl<T> IntoDartExceptPrimitive for Option<T> where T: IntoDart {}
+
 impl<T, E> IntoDart for Result<T, E>
 where
     T: IntoDart,
@@ -181,6 +254,13 @@ where
             Err(e) => e.to_string().into_dart(),
         }
     }
+}
+
+impl<T, E> IntoDartExceptPrimitive for Result<T, E>
+where
+    T: IntoDart,
+    E: ToString,
+{
 }
 
 /// A workaround to send raw pointers to dart over the port.

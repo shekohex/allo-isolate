@@ -5,7 +5,11 @@ use allo_isolate::{
     },
     IntoDart,
 };
-use std::{collections::HashMap, ffi::CStr, sync::Mutex};
+use std::{
+    collections::HashMap,
+    ffi::{c_void, CStr},
+    sync::Mutex,
+};
 
 thread_local! {
   static DART_VM: DartVM = DartVM::new();
@@ -129,24 +133,88 @@ impl VMIsolate {
             DartTypedData => {
                 let v = unsafe { o.value.as_typed_data };
                 let ty = v.ty;
-                match ty {
-                    DartTypedDataType::Int8 => {
-                        let _ = unsafe {
-                            from_buf_raw(v.values as *mut i8, v.length as usize)
-                        };
-                    },
-                    DartTypedDataType::Uint8 => {
-                        let _ = unsafe {
-                            from_buf_raw(v.values as *mut u8, v.length as usize)
-                        };
-                    },
-                    _ => unimplemented!(),
-                };
+                unsafe {
+                    match ty {
+                        DartTypedDataType::Int8 => {
+                            let _ = from_buf_raw(
+                                v.values as *mut i8,
+                                v.length as usize,
+                            );
+                        },
+                        DartTypedDataType::Uint8 => {
+                            let _ = from_buf_raw(
+                                v.values as *mut u8,
+                                v.length as usize,
+                            );
+                        },
+                        DartTypedDataType::Int16 => {
+                            let _ = from_buf_raw(
+                                v.values as *mut i16,
+                                v.length as usize,
+                            );
+                        },
+                        DartTypedDataType::Uint16 => {
+                            let _ = from_buf_raw(
+                                v.values as *mut u16,
+                                v.length as usize,
+                            );
+                        },
+                        DartTypedDataType::Int32 => {
+                            let _ = from_buf_raw(
+                                v.values as *mut i32,
+                                v.length as usize,
+                            );
+                        },
+                        DartTypedDataType::Uint32 => {
+                            let _ = from_buf_raw(
+                                v.values as *mut u32,
+                                v.length as usize,
+                            );
+                        },
+                        DartTypedDataType::Int64 => {
+                            let _ = from_buf_raw(
+                                v.values as *mut i64,
+                                v.length as usize,
+                            );
+                        },
+                        DartTypedDataType::Uint64 => {
+                            let _ = from_buf_raw(
+                                v.values as *mut u64,
+                                v.length as usize,
+                            );
+                        },
+                        DartTypedDataType::Float32 => {
+                            let _ = from_buf_raw(
+                                v.values as *mut f32,
+                                v.length as usize,
+                            );
+                        },
+                        DartTypedDataType::Float64 => {
+                            let _ = from_buf_raw(
+                                v.values as *mut f64,
+                                v.length as usize,
+                            );
+                        },
+                        _ => unimplemented!(),
+                    };
+                }
             },
             DartExternalTypedData => {
                 let v = unsafe { o.value.as_external_typed_data };
                 let ty = v.ty;
+
                 match ty {
+                    DartTypedDataType::Int8 => {
+                        let _ = unsafe {
+                            let output = from_buf_raw(
+                                v.data as *mut i8,
+                                v.length as usize,
+                            );
+                            let cb = v.callback;
+                            cb(v.length as *mut c_void, v.peer);
+                            output
+                        };
+                    },
                     DartTypedDataType::Uint8 => {
                         let _ = unsafe {
                             let output = from_buf_raw(
@@ -154,7 +222,95 @@ impl VMIsolate {
                                 v.length as usize,
                             );
                             let cb = v.callback;
-                            cb(v.length, v.peer);
+                            cb(v.length as *mut c_void, v.peer);
+                            output
+                        };
+                    },
+                    DartTypedDataType::Int16 => {
+                        let _ = unsafe {
+                            let output = from_buf_raw(
+                                v.data as *mut i16,
+                                v.length as usize,
+                            );
+                            let cb = v.callback;
+                            cb(v.length as *mut c_void, v.peer);
+                            output
+                        };
+                    },
+                    DartTypedDataType::Uint16 => {
+                        let _ = unsafe {
+                            let output = from_buf_raw(
+                                v.data as *mut u16,
+                                v.length as usize,
+                            );
+                            let cb = v.callback;
+                            cb(v.length as *mut c_void, v.peer);
+                            output
+                        };
+                    },
+                    DartTypedDataType::Int32 => {
+                        let _ = unsafe {
+                            let output = from_buf_raw(
+                                v.data as *mut i32,
+                                v.length as usize,
+                            );
+                            let cb = v.callback;
+                            cb(v.length as *mut c_void, v.peer);
+                            output
+                        };
+                    },
+                    DartTypedDataType::Uint32 => {
+                        let _ = unsafe {
+                            let output = from_buf_raw(
+                                v.data as *mut u32,
+                                v.length as usize,
+                            );
+                            let cb = v.callback;
+                            cb(v.length as *mut c_void, v.peer);
+                            output
+                        };
+                    },
+                    DartTypedDataType::Int64 => {
+                        let _ = unsafe {
+                            let output = from_buf_raw(
+                                v.data as *mut i64,
+                                v.length as usize,
+                            );
+                            let cb = v.callback;
+                            cb(v.length as *mut c_void, v.peer);
+                            output
+                        };
+                    },
+                    DartTypedDataType::Uint64 => {
+                        let _ = unsafe {
+                            let output = from_buf_raw(
+                                v.data as *mut u64,
+                                v.length as usize,
+                            );
+                            let cb = v.callback;
+                            cb(v.length as *mut c_void, v.peer);
+                            output
+                        };
+                    },
+                    DartTypedDataType::Float32 => {
+                        let _ = unsafe {
+                            let output = from_buf_raw(
+                                v.data as *mut f32,
+                                v.length as usize,
+                            );
+                            let cb = v.callback;
+                            cb(v.length as *mut c_void, v.peer);
+                            output
+                        };
+                    },
+                    DartTypedDataType::Float64 => {
+                        let _ = unsafe {
+                            let output = from_buf_raw(
+                                v.data as *mut f64,
+                                v.length as usize,
+                            );
+                            let cb = v.callback;
+                            cb(v.length as *mut c_void, v.peer);
                             output
                         };
                     },
