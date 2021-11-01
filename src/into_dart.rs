@@ -111,6 +111,9 @@ impl IntoDart for CString {
 
 impl IntoDartExceptPrimitive for CString {}
 
+/// It is used when you want to write a generic function on different data types
+/// and do not want to repeat yourself dozens of times.
+/// For example, inside [Drop] of [DartCObject].
 pub(crate) trait DartTypedDataTypeVisitor {
     fn visit<T: DartTypedDataTypeTrait>(&self);
 }
