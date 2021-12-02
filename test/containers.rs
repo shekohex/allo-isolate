@@ -1,4 +1,4 @@
-use allo_isolate::{Isolate, ZeroCopyBuffer};
+use allo_isolate::{ffi::DartCObjectType, IntoDart, Isolate, ZeroCopyBuffer};
 
 mod vm;
 
@@ -52,4 +52,13 @@ fn main() {
     assert!(isolate.post(ZeroCopyBuffer(vec![42u64; 100])));
     assert!(isolate.post(ZeroCopyBuffer(vec![42.0f32; 100])));
     assert!(isolate.post(ZeroCopyBuffer(vec![42.0f64; 100])));
+
+    {
+        // https://github.com/sunshine-protocol/allo-isolate/pull/17
+        let u32_into_dart = 0xfe112233_u32.into_dart();
+        assert_eq!(DartCObjectType::DartInt64, u32_into_dart.ty);
+        unsafe {
+            assert_eq!(0xfe112233_i64, u32_into_dart.value.as_int64);
+        }
+    }
 }
