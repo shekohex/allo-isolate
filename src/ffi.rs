@@ -5,8 +5,6 @@ use std::{
     os::raw,
 };
 
-use DartCObjectType::*;
-
 use crate::{
     dart_array::DartArray,
     into_dart::{
@@ -70,8 +68,9 @@ pub enum DartCObjectType {
     DartExternalTypedData = 8,
     DartSendPort = 9,
     DartCapability = 10,
-    DartUnsupported = 11,
-    DartNumberOfTypes = 12,
+    DartNativePointer = 11,
+    DartUnsupported = 12,
+    DartNumberOfTypes = 13,
 }
 
 #[allow(missing_debug_implementations)]
@@ -95,6 +94,7 @@ pub union DartCObjectValue {
     pub as_array: DartNativeArray,
     pub as_typed_data: DartNativeTypedData,
     pub as_external_typed_data: DartNativeExternalTypedData,
+    pub as_native_pointer: DartNativePointer,
     _bindgen_union_align: [u64; 5usize],
 }
 
@@ -136,6 +136,14 @@ pub struct DartNativeExternalTypedData {
     pub callback: DartHandleFinalizer,
 }
 
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DartNativePointer {
+    pub ptr: isize,
+    pub size: isize,
+    pub callback: DartHandleFinalizer,
+}
+
 /// https://github.com/dart-lang/sdk/blob/main/runtime/include/dart_api.h
 pub type DartHandleFinalizer =
     unsafe extern "C" fn(isolate_callback_data: *mut c_void, peer: *mut c_void);
@@ -164,13 +172,13 @@ pub type DartPostCObjectFnType =
 impl Drop for DartCObject {
     fn drop(&mut self) {
         match self.ty {
-            DartString => {
+            DartCObjectType::DartString => {
                 let _ = unsafe { CString::from_raw(self.value.as_string) };
-            },
-            DartArray => {
+            }
+            DartCObjectType::DartArray => {
                 let _ = DartArray::from(unsafe { self.value.as_array });
-            },
-            DartTypedData => {
+            }
+            DartCObjectType::DartTypedData => {
                 struct MyVisitor<'a>(&'a DartNativeTypedData);
                 impl DartTypedDataTypeVisitor for MyVisitor<'_> {
                     fn visit<T: DartTypedDataTypeTrait>(&self) {
@@ -186,20 +194,29 @@ impl Drop for DartCObject {
 
                 let v = unsafe { self.value.as_typed_data };
                 visit_dart_typed_data_type(v.ty, &MyVisitor(&v));
-            },
+            }
             // write out all cases in order to be explicit - we do not want to
             // leak any memory
-            DartNull | DartBool | DartInt32 | DartInt64 | DartDouble => {
+            DartCObjectType::DartNull
+            | DartCObjectType::DartBool
+            | DartCObjectType::DartInt32
+            | DartCObjectType::DartInt64
+            | DartCObjectType::DartDouble => {
                 // do nothing, since they are primitive types
-            },
-            DartExternalTypedData => {
+            }
+            DartCObjectType::DartExternalTypedData => {
                 // do NOT free any memory here
                 // see https://github.com/sunshine-protocol/allo-isolate/issues/7
-            },
-            DartSendPort | DartCapability | DartUnsupported
-            | DartNumberOfTypes => {
+            }
+            DartCObjectType::DartSendPort
+            | DartCObjectType::DartCapability
+            | DartCObjectType::DartUnsupported
+            | DartCObjectType::DartNumberOfTypes => {
                 // not sure what to do here
-            },
+            }
+            DartCObjectType::DartNativePointer => {
+                // do not free the memory here, this will be done when the callback is called
+            }
         }
     }
 }
