@@ -174,10 +174,10 @@ impl Drop for DartCObject {
         match self.ty {
             DartCObjectType::DartString => {
                 let _ = unsafe { CString::from_raw(self.value.as_string) };
-            }
+            },
             DartCObjectType::DartArray => {
                 let _ = DartArray::from(unsafe { self.value.as_array });
-            }
+            },
             DartCObjectType::DartTypedData => {
                 struct MyVisitor<'a>(&'a DartNativeTypedData);
                 impl DartTypedDataTypeVisitor for MyVisitor<'_> {
@@ -194,7 +194,7 @@ impl Drop for DartCObject {
 
                 let v = unsafe { self.value.as_typed_data };
                 visit_dart_typed_data_type(v.ty, &MyVisitor(&v));
-            }
+            },
             // write out all cases in order to be explicit - we do not want to
             // leak any memory
             DartCObjectType::DartNull
@@ -203,20 +203,21 @@ impl Drop for DartCObject {
             | DartCObjectType::DartInt64
             | DartCObjectType::DartDouble => {
                 // do nothing, since they are primitive types
-            }
+            },
             DartCObjectType::DartExternalTypedData => {
                 // do NOT free any memory here
                 // see https://github.com/sunshine-protocol/allo-isolate/issues/7
-            }
+            },
             DartCObjectType::DartSendPort
             | DartCObjectType::DartCapability
             | DartCObjectType::DartUnsupported
             | DartCObjectType::DartNumberOfTypes => {
                 // not sure what to do here
-            }
+            },
             DartCObjectType::DartNativePointer => {
-                // do not free the memory here, this will be done when the callback is called
-            }
+                // do not free the memory here, this will be done when the
+                // callback is called
+            },
         }
     }
 }
