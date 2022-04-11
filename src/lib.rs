@@ -123,6 +123,9 @@ impl Isolate {
                 let result = func(self.port, ptr);
                 // free the object
                 let boxed_obj = Box::from_raw(ptr);
+                if !result && boxed_obj.ty == DartCObjectType::DartExternalTypedData {
+                    (boxed_obj.value.as_external_typed_data.callback)(boxed_obj.value.as_external_typed_data.data as *mut c_void, boxed_obj.value.as_external_typed_data.peer);
+                }
                 drop(boxed_obj);
                 // I like that dance haha
                 result
