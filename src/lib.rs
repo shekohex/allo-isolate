@@ -26,7 +26,8 @@
 //! See [`flutterust`](https://github.com/shekohex/flutterust/tree/master/native/scrap-ffi) and how we used it in the `scrap` package to create a webscrapper using Rust and Flutter.
 /// Holds the Raw Dart FFI Types Required to send messages to Isolate
 use atomic::Atomic;
-use std::{future::Future, sync::atomic::Ordering};
+use ffi::DartCObjectType;
+use std::{future::Future, sync::atomic::Ordering, ffi::c_void};
 
 pub use ffi::ZeroCopyBuffer;
 pub use into_dart::{IntoDart, IntoDartExceptPrimitive};
