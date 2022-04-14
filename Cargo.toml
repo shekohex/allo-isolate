@@ -21,7 +21,7 @@ fastrand = "^1.3"
 # These are used for tests
 [[example]]
 name = "containers"
-path = "test/containers.rs"
+path = "tests/containers.rs"
 
 [features]
 default = []
