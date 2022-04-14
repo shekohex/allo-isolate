@@ -3,7 +3,8 @@ use allo_isolate::{ffi::DartCObjectType, IntoDart, Isolate, ZeroCopyBuffer};
 mod vm;
 
 fn main() {
-    // Create a Dart VM call before we could handle sending a message back to Dart
+    // Create a Dart VM call before we could handle sending a message back to
+    // Dart
     let port = vm::port();
     assert_ne!(port, -1);
     let isolate = Isolate::new(port);
@@ -30,7 +31,8 @@ fn main() {
     assert!(!isolate.post(ZeroCopyBuffer(vec![42.0f32; 100])));
     assert!(!isolate.post(ZeroCopyBuffer(vec![42.0f64; 100])));
 
-    // Provide the pointer that allows Rust to communicate messages back to the Dart VM
+    // Provide the pointer that allows Rust to communicate messages back to the
+    // Dart VM
     unsafe {
         allo_isolate::store_dart_post_cobject(vm::dart_post_cobject);
     }
@@ -118,11 +120,8 @@ fn main() {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     #[test]
-    fn can_run_valgrind_main() {
-        super::main();
-    }
+    fn can_run_valgrind_main() { super::main(); }
 }
