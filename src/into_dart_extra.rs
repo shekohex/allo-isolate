@@ -4,6 +4,22 @@
 
 use crate::{ffi::*, IntoDart};
 
+impl IntoDart for i8 {
+    fn into_dart(self) -> DartCObject { (self as i32).into_dart() }
+}
+
+impl IntoDart for i16 {
+    fn into_dart(self) -> DartCObject { (self as i32).into_dart() }
+}
+
+impl IntoDart for u8 {
+    fn into_dart(self) -> DartCObject { (self as i32).into_dart() }
+}
+
+impl IntoDart for u16 {
+    fn into_dart(self) -> DartCObject { (self as i32).into_dart() }
+}
+
 impl IntoDart for u32 {
     fn into_dart(self) -> DartCObject { (self as i64).into_dart() }
 }
