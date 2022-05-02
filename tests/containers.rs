@@ -41,6 +41,10 @@ fn main() {
     let port = vm::port();
     assert_ne!(port, -1);
     let isolate = Isolate::new(port);
+    assert!(isolate.post(42i8));
+    assert!(isolate.post(42u8));
+    assert!(isolate.post(42i16));
+    assert!(isolate.post(42u16));
     assert!(isolate.post(42i32));
     assert!(isolate.post(42u32));
     assert!(isolate.post(42i64));
@@ -123,5 +127,7 @@ fn main() {
 #[cfg(test)]
 mod tests {
     #[test]
-    fn can_run_valgrind_main() { super::main(); }
+    fn can_run_valgrind_main() {
+        super::main();
+    }
 }
