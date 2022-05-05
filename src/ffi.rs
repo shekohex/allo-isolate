@@ -33,6 +33,7 @@ pub enum DartTypedDataType {
     Float64 = 11,
     Float32x4 = 12,
     Invalid = 13,
+    Usize = 14,
 }
 
 /// A Dart_CObject is used for representing Dart objects as native C
