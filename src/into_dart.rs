@@ -144,6 +144,24 @@ macro_rules! dart_typed_data_type_trait_impl {
                 }
             }
 
+            impl<const N: usize> IntoDart for [$rust_type;N] {
+                fn into_dart(self) -> DartCObject {
+                    let vec: Vec<_> = self.into();
+                    let mut vec = ManuallyDrop::new(vec);
+                    let data = DartNativeTypedData {
+                        ty: $rust_type::dart_typed_data_type(),
+                        length: vec.len() as isize,
+                        values: vec.as_mut_ptr() as *mut _,
+                    };
+                    DartCObject {
+                        ty: DartCObjectType::DartTypedData,
+                        value: DartCObjectValue {
+                            as_typed_data: data,
+                        },
+                    }
+                }
+            }
+
             impl IntoDart for Vec<$rust_type> {
                 fn into_dart(self) -> DartCObject {
                     let mut vec = ManuallyDrop::new(self);
@@ -229,7 +247,7 @@ impl<T> IntoDartExceptPrimitive for ZeroCopyBuffer<Vec<T>> where
 {
 }
 
-impl<T: Copy, const N: usize> IntoDart for [T; N]
+impl<T, const N: usize> IntoDart for [T; N]
 where
     T: IntoDartExceptPrimitive,
 {
