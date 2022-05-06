@@ -37,6 +37,7 @@ impl IntoDart for u128 {
 }
 
 #[cfg(target_pointer_width = "64")]
+#[cfg(target_pointer_width = "32")]
 impl IntoDart for usize {
-    fn into_dart(self) -> DartCObject { (self as u64 as i64).into_dart() }
+    fn into_dart(self) -> DartCObject { (self as u32 as i32).into_dart() }
 }
