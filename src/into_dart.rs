@@ -26,9 +26,7 @@ impl<T> IntoDart for T
 where
     T: Into<DartCObject>,
 {
-    fn into_dart(self) -> DartCObject {
-        self.into()
-    }
+    fn into_dart(self) -> DartCObject { self.into() }
 }
 
 impl<T> IntoDartExceptPrimitive for T where T: IntoDart + Into<DartCObject> {}
@@ -64,9 +62,7 @@ impl IntoDart for i64 {
 }
 
 impl IntoDart for f32 {
-    fn into_dart(self) -> DartCObject {
-        (self as f64).into_dart()
-    }
+    fn into_dart(self) -> DartCObject { (self as f64).into_dart() }
 }
 
 impl IntoDart for f64 {
@@ -97,9 +93,7 @@ impl IntoDart for String {
 impl IntoDartExceptPrimitive for String {}
 
 impl IntoDart for &'_ str {
-    fn into_dart(self) -> DartCObject {
-        self.to_string().into_dart()
-    }
+    fn into_dart(self) -> DartCObject { self.to_string().into_dart() }
 }
 
 impl IntoDartExceptPrimitive for &'_ str {}
@@ -212,8 +206,7 @@ dart_typed_data_type_trait_impl!(
     DartTypedDataType::Int64 => i64 + free_zero_copy_buffer_i64,
     DartTypedDataType::Uint64 => u64 + free_zero_copy_buffer_u64,
     DartTypedDataType::Float32 => f32 + free_zero_copy_buffer_f32,
-    DartTypedDataType::Float64 => f64 + free_zero_copy_buffer_f64,
-    DartTypedDataType::Usize => usize + free_zero_copy_buffer_usize
+    DartTypedDataType::Float64 => f64 + free_zero_copy_buffer_f64
 );
 
 impl<T> IntoDart for ZeroCopyBuffer<Vec<T>>
@@ -251,18 +244,14 @@ impl<T, const N: usize> IntoDart for [T; N]
 where
     T: IntoDartExceptPrimitive,
 {
-    fn into_dart(self) -> DartCObject {
-        DartArray::from(self).into_dart()
-    }
+    fn into_dart(self) -> DartCObject { DartArray::from(self).into_dart() }
 }
 
 impl<T> IntoDart for Vec<T>
 where
     T: IntoDartExceptPrimitive,
 {
-    fn into_dart(self) -> DartCObject {
-        DartArray::from(self).into_dart()
-    }
+    fn into_dart(self) -> DartCObject { DartArray::from(self).into_dart() }
 }
 
 impl<T> IntoDart for Option<T>

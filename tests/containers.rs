@@ -20,7 +20,6 @@ fn main() {
     assert!(!isolate.post(vec![42u64; 100]));
     assert!(!isolate.post(vec![42.0f32; 100]));
     assert!(!isolate.post(vec![42.0f64; 100]));
-    assert!(!isolate.post(vec![42usize; 100]));
     assert!(!isolate.post(ZeroCopyBuffer(vec![42i8; 100])));
     assert!(!isolate.post(ZeroCopyBuffer(vec![42u8; 100])));
     assert!(!isolate.post(ZeroCopyBuffer(vec![42i16; 100])));
@@ -31,7 +30,6 @@ fn main() {
     assert!(!isolate.post(ZeroCopyBuffer(vec![42u64; 100])));
     assert!(!isolate.post(ZeroCopyBuffer(vec![42.0f32; 100])));
     assert!(!isolate.post(ZeroCopyBuffer(vec![42.0f64; 100])));
-    assert!(!isolate.post(ZeroCopyBuffer(vec![42usize; 100])));
 
     // Provide the pointer that allows Rust to communicate messages back to the
     // Dart VM
@@ -106,7 +104,6 @@ fn main() {
     assert!(isolate.post(vec![42u64; 100]));
     assert!(isolate.post(vec![42.0f32; 100]));
     assert!(isolate.post(vec![42.0f64; 100]));
-    assert!(isolate.post(vec![42usize; 100]));
     assert!(isolate.post(ZeroCopyBuffer(vec![42i8; 100])));
     assert!(isolate.post(ZeroCopyBuffer(vec![42u8; 100])));
     assert!(isolate.post(ZeroCopyBuffer(vec![42i16; 100])));
@@ -117,7 +114,6 @@ fn main() {
     assert!(isolate.post(ZeroCopyBuffer(vec![42u64; 100])));
     assert!(isolate.post(ZeroCopyBuffer(vec![42.0f32; 100])));
     assert!(isolate.post(ZeroCopyBuffer(vec![42.0f64; 100])));
-    assert!(isolate.post(ZeroCopyBuffer(vec![42usize; 100])));
 
     {
         // https://github.com/sunshine-protocol/allo-isolate/pull/17
@@ -132,7 +128,5 @@ fn main() {
 #[cfg(test)]
 mod tests {
     #[test]
-    fn can_run_valgrind_main() {
-        super::main();
-    }
+    fn can_run_valgrind_main() { super::main(); }
 }
