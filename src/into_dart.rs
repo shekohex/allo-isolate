@@ -240,14 +240,46 @@ impl<T> IntoDartExceptPrimitive for ZeroCopyBuffer<Vec<T>> where
 {
 }
 
-impl<T, const N: usize> IntoDart for [T; N]
+impl<T> IntoDart for Vec<T>
 where
     T: IntoDartExceptPrimitive,
 {
     fn into_dart(self) -> DartCObject { DartArray::from(self).into_dart() }
 }
 
-impl<T> IntoDart for Vec<T>
+impl<T, const N: usize> IntoDart for ZeroCopyBuffer<[T; N]>
+where
+    T: DartTypedDataTypeTrait,
+{
+    fn into_dart(self) -> DartCObject {
+        let vec: Vec<_> = self.0.into();
+        let mut vec = ManuallyDrop::new(vec);
+        vec.shrink_to_fit();
+        let length = vec.len();
+        assert_eq!(length, vec.capacity());
+        let ptr = vec.as_mut_ptr();
+
+        DartCObject {
+            ty: DartCObjectType::DartExternalTypedData,
+            value: DartCObjectValue {
+                as_external_typed_data: DartNativeExternalTypedData {
+                    ty: T::dart_typed_data_type(),
+                    length: length as isize,
+                    data: ptr as *mut u8,
+                    peer: ptr as *mut c_void,
+                    callback: T::function_pointer_of_free_zero_copy_buffer(),
+                },
+            },
+        }
+    }
+}
+
+impl<T, const N: usize> IntoDartExceptPrimitive for ZeroCopyBuffer<[T; N]> where
+    T: DartTypedDataTypeTrait
+{
+}
+
+impl<T, const N: usize> IntoDart for [T; N]
 where
     T: IntoDartExceptPrimitive,
 {

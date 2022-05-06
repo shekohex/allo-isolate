@@ -31,6 +31,26 @@ fn main() {
     assert!(!isolate.post(ZeroCopyBuffer(vec![42.0f32; 100])));
     assert!(!isolate.post(ZeroCopyBuffer(vec![42.0f64; 100])));
 
+    assert!(!isolate.post([42i8; 100]));
+    assert!(!isolate.post([42u8; 100]));
+    assert!(!isolate.post([42i16; 100]));
+    assert!(!isolate.post([42u16; 100]));
+    assert!(!isolate.post([42i32; 100]));
+    assert!(!isolate.post([42u32; 100]));
+    assert!(!isolate.post([42i64; 100]));
+    assert!(!isolate.post([42u64; 100]));
+    assert!(!isolate.post([42.0f32; 100]));
+    assert!(!isolate.post([42.0f64; 100]));
+    assert!(!isolate.post(ZeroCopyBuffer([42i8; 100])));
+    assert!(!isolate.post(ZeroCopyBuffer([42u8; 100])));
+    assert!(!isolate.post(ZeroCopyBuffer([42i16; 100])));
+    assert!(!isolate.post(ZeroCopyBuffer([42u16; 100])));
+    assert!(!isolate.post(ZeroCopyBuffer([42i32; 100])));
+    assert!(!isolate.post(ZeroCopyBuffer([42u32; 100])));
+    assert!(!isolate.post(ZeroCopyBuffer([42i64; 100])));
+    assert!(!isolate.post(ZeroCopyBuffer([42u64; 100])));
+    assert!(!isolate.post(ZeroCopyBuffer([42.0f32; 100])));
+    assert!(!isolate.post(ZeroCopyBuffer([42.0f64; 100])));
     // Provide the pointer that allows Rust to communicate messages back to the
     // Dart VM
     unsafe {
@@ -115,6 +135,26 @@ fn main() {
     assert!(isolate.post(ZeroCopyBuffer(vec![42.0f32; 100])));
     assert!(isolate.post(ZeroCopyBuffer(vec![42.0f64; 100])));
 
+    assert!(isolate.post([42i8; 100]));
+    assert!(isolate.post([42u8; 100]));
+    assert!(isolate.post([42i16; 100]));
+    assert!(isolate.post([42u16; 100]));
+    assert!(isolate.post([42i32; 100]));
+    assert!(isolate.post([42u32; 100]));
+    assert!(isolate.post([42i64; 100]));
+    assert!(isolate.post([42u64; 100]));
+    assert!(isolate.post([42.0f32; 100]));
+    assert!(isolate.post([42.0f64; 100]));
+    assert!(isolate.post(ZeroCopyBuffer([42i8; 100])));
+    assert!(isolate.post(ZeroCopyBuffer([42u8; 100])));
+    assert!(isolate.post(ZeroCopyBuffer([42i16; 100])));
+    assert!(isolate.post(ZeroCopyBuffer([42u16; 100])));
+    assert!(isolate.post(ZeroCopyBuffer([42i32; 100])));
+    assert!(isolate.post(ZeroCopyBuffer([42u32; 100])));
+    assert!(isolate.post(ZeroCopyBuffer([42i64; 100])));
+    assert!(isolate.post(ZeroCopyBuffer([42u64; 100])));
+    assert!(isolate.post(ZeroCopyBuffer([42.0f32; 100])));
+    assert!(isolate.post(ZeroCopyBuffer([42.0f64; 100])));
     {
         // https://github.com/sunshine-protocol/allo-isolate/pull/17
         let u32_into_dart = 0xfe112233_u32.into_dart();
