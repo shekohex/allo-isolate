@@ -253,24 +253,7 @@ where
 {
     fn into_dart(self) -> DartCObject {
         let vec: Vec<_> = self.0.into();
-        let mut vec = ManuallyDrop::new(vec);
-        vec.shrink_to_fit();
-        let length = vec.len();
-        assert_eq!(length, vec.capacity());
-        let ptr = vec.as_mut_ptr();
-
-        DartCObject {
-            ty: DartCObjectType::DartExternalTypedData,
-            value: DartCObjectValue {
-                as_external_typed_data: DartNativeExternalTypedData {
-                    ty: T::dart_typed_data_type(),
-                    length: length as isize,
-                    data: ptr as *mut u8,
-                    peer: ptr as *mut c_void,
-                    callback: T::function_pointer_of_free_zero_copy_buffer(),
-                },
-            },
-        }
+        ZeroCopyBuffer(vec).into_dart()
     }
 }
 
