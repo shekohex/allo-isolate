@@ -233,7 +233,9 @@ impl<T> IntoDart for Vec<T>
 where
     T: IntoDartExceptPrimitive,
 {
-    fn into_dart(self) -> DartCObject { DartArray::from(self).into_dart() }
+    fn into_dart(self) -> DartCObject {
+        DartArray::from(self.into_iter()).into_dart()
+    }
 }
 
 impl<T, const N: usize> IntoDart for ZeroCopyBuffer<[T; N]>
@@ -255,7 +257,9 @@ impl<T, const N: usize> IntoDart for [T; N]
 where
     T: IntoDartExceptPrimitive,
 {
-    fn into_dart(self) -> DartCObject { DartArray::from(self).into_dart() }
+    fn into_dart(self) -> DartCObject {
+        DartArray::from(IntoIterator::into_iter(self)).into_dart()
+    }
 }
 
 impl<T> IntoDart for Option<T>

@@ -14,26 +14,12 @@ pub struct DartArray {
     inner: Box<[*mut DartCObject]>,
 }
 
-impl<T: IntoDart, const N: usize> From<[T; N]> for DartArray {
-    fn from(vec: [T; N]) -> Self {
-        let vec: Vec<_> = IntoIterator::into_iter(vec)
-            // convert them to dart objects
-            .map(IntoDart::into_dart)
-            // box them to be transferred to dart
-            .map(Box::new)
-            // as pointers
-            .map(Box::into_raw)
-            // then collect everything
-            .collect();
-        let inner = vec.into_boxed_slice();
-        Self { inner }
-    }
-}
-
-impl<T: IntoDart> From<Vec<T>> for DartArray {
-    fn from(vec: Vec<T>) -> Self {
-        let vec: Vec<_> = vec.
-            into_iter()
+impl<I, T: IntoDart> From<I> for DartArray
+where
+    I: Iterator<Item = T>,
+{
+    fn from(iter: I) -> Self {
+        let vec: Vec<_> = iter
             // convert them to dart objects
             .map(IntoDart::into_dart)
             // box them to be transferred to dart
