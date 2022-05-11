@@ -1,6 +1,6 @@
 [package]
 name = "allo-isolate"
-version = "0.1.13-beta.4"
+version = "0.1.13-beta.5"
 authors = [
     "Sunshine Foundation Developers",
     "Shady Khalifa <shekohex@gmail.com>",
