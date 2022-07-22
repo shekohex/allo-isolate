@@ -1,7 +1,4 @@
-#![allow(
-    missing_docs,
-    clippy::derive_partial_eq_without_eq
-)]
+#![allow(missing_docs, clippy::derive_partial_eq_without_eq)]
 
 use std::{
     ffi::{c_void, CString},
