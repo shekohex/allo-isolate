@@ -65,7 +65,7 @@ impl Drop for DartArray {
     fn drop(&mut self) {
         for v in self.inner.iter() {
             unsafe {
-                Box::from_raw(*v);
+                let _ = Box::from_raw(*v);
             }
         }
     }
