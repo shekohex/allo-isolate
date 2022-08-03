@@ -43,6 +43,11 @@ impl IntoDart for () {
     }
 }
 
+#[cfg(feature = "anyhow")]
+impl IntoDart for anyhow::Error {
+    fn into_dart(self) -> DartCObject { format!("{:?}", self).into_dart() }
+}
+
 impl IntoDart for i32 {
     fn into_dart(self) -> DartCObject {
         DartCObject {
