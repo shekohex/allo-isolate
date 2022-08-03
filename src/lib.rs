@@ -97,9 +97,7 @@ impl Isolate {
     /// # use allo_isolate::Isolate;
     /// let isolate = Isolate::new(42);
     /// ```
-    pub const fn new(port: i64) -> Self {
-        Self { port }
-    }
+    pub const fn new(port: i64) -> Self { Self { port } }
 
     /// Post an object to the [`Isolate`] over the port
     /// Object must implement [`IntoDart`].

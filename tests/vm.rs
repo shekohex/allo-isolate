@@ -53,9 +53,7 @@ impl DartVM {
 struct VMIsolate;
 
 impl VMIsolate {
-    const fn new() -> Self {
-        Self
-    }
+    const fn new() -> Self { Self }
 
     fn exec(&mut self, object: *mut DartCObject) -> bool {
         use DartCObjectType::*;
@@ -338,6 +336,4 @@ pub extern "C" fn dart_post_cobject(port: i64, msg: *mut DartCObject) -> bool {
     DART_VM.with(|vm| vm.post(port, msg))
 }
 
-pub fn port() -> i64 {
-    DART_VM.with(|vm| vm.port())
-}
+pub fn port() -> i64 { DART_VM.with(|vm| vm.port()) }
