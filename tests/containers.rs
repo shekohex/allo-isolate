@@ -168,5 +168,7 @@ fn main() {
 #[cfg(test)]
 mod tests {
     #[test]
-    fn can_run_valgrind_main() { super::main(); }
+    fn can_run_valgrind_main() {
+        super::main();
+    }
 }

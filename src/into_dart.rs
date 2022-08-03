@@ -45,10 +45,10 @@ impl IntoDart for () {
     }
 }
 
-#[cfg(feature="anyhow")]
+#[cfg(feature = "anyhow")]
 impl IntoDart for anyhow::Error {
     fn into_dart(self) -> DartCObject {
-        self.to_string().into_dart()
+        format!("{:?}", self).into_dart()
     }
 }
 
