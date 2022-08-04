@@ -18,6 +18,7 @@ license-file = "LICENSE"
 pin-project = { version = "1.0.8", optional = true }
 atomic = "0.5"
 anyhow = { version = "1.0.58", optional = true }
+backtrace = { version = "0.3.66", optional = true }
 
 [dev-dependencies]
 fastrand = "^1.3"
