@@ -48,6 +48,11 @@ impl IntoDart for anyhow::Error {
     fn into_dart(self) -> DartCObject { format!("{:?}", self).into_dart() }
 }
 
+#[cfg(feature = "backtrace")]
+impl IntoDart for backtrace::Backtrace {
+    fn into_dart(self) -> DartCObject { format!("{:?}", self).into_dart() }
+}
+
 impl IntoDart for i32 {
     fn into_dart(self) -> DartCObject {
         DartCObject {
