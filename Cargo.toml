@@ -1,9 +1,9 @@
 [package]
 name = "allo-isolate"
-version = "0.1.13"
+version = "0.1.14-beta.1"
 authors = [
     "Sunshine Foundation Developers",
-    "Shady Khalifa <shekohex@gmail.com>",
+    "Shady Khalifa <dev@shadykhalifa.me>",
 ]
 edition = "2018"
 description = "Run Multithreaded Rust along with Dart VM (in isolate)."
@@ -15,8 +15,8 @@ homepage = "https://github.com/sunshine-protocol/allo-isolate"
 license-file = "LICENSE"
 
 [dependencies]
-pin-project = { version = "1.0.8", optional = true }
 atomic = "0.5"
+pin-project = { version = "1.0.8", optional = true }
 anyhow = { version = "1.0.58", optional = true }
 backtrace = { version = "0.3.66", optional = true }
 
