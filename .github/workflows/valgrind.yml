@@ -17,8 +17,15 @@ jobs:
           toolchain: nightly
           override: true
 
+      # - name: Install valgrind
+      #   run: sudo apt install -y valgrind
+
       - name: Install valgrind
-        run: sudo apt install -y valgrind
+        run: |
+          sudo apt update && sudo apt install -y libclang-dev libc6-dbg \
+          && wget -O valgrind.tar.bz2 https://sourceware.org/pub/valgrind/valgrind-3.19.0.tar.bz2 \
+          && mkdir valgrind && tar -xvjf valgrind.tar.bz2 -C valgrind --strip-components=1 \
+          && cd valgrind && ./configure && make && sudo make install
 
       - name: Run cargo build
         uses: actions-rs/cargo@v1
