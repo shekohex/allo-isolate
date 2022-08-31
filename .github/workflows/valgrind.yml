@@ -24,7 +24,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --example containers
+          args: "--example containers --features 'anyhow backtrace'"
 
       - name: Run valgrind
         run: valgrind --error-exitcode=1 --leak-check=full ./target/debug/examples/containers
