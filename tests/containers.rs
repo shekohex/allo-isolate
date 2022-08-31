@@ -163,7 +163,18 @@ fn main() {
             assert_eq!(0xfe112233_i64, u32_into_dart.value.as_int64);
         }
     }
+
+    assert!(isolate.post(return_anyhow_error()));
+    assert!(isolate.post(return_backtrace()));
+
+    println!("all done!");
 }
+
+fn return_anyhow_error() -> anyhow::Result<()> {
+    Err(anyhow::anyhow!("sample error"))
+}
+
+fn return_backtrace() -> backtrace::Backtrace { backtrace::Backtrace::new() }
 
 #[cfg(test)]
 mod tests {
