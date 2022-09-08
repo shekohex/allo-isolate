@@ -168,6 +168,8 @@ fn main() {
     assert!(isolate.post(return_anyhow_error()));
     #[cfg(feature = "backtrace")]
     assert!(isolate.post(return_backtrace()));
+    #[cfg(feature = "chrono")]
+    assert!(isolate.post(return_chrono()));
 
     println!("all done!");
 }
@@ -179,6 +181,11 @@ fn return_anyhow_error() -> anyhow::Result<()> {
 
 #[cfg(feature = "backtrace")]
 fn return_backtrace() -> backtrace::Backtrace { backtrace::Backtrace::new() }
+
+#[cfg(feature = "chrono")]
+fn return_chrono() -> chrono::DateTime<chrono::Utc> {
+    chrono::Utc::now()
+}
 
 #[cfg(test)]
 mod tests {
