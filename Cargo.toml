@@ -19,6 +19,7 @@ atomic = "0.5"
 pin-project = { version = "1.0.8", optional = true }
 anyhow = { version = "1.0.58", optional = true }
 backtrace = { version = "0.3.66", optional = true }
+chrono = { version = "0.4.22", optional = true }
 
 [dev-dependencies]
 fastrand = "^1.3"
