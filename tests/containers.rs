@@ -114,6 +114,20 @@ fn main() {
 
     assert!(isolate.post(vec![String::from("Rust"); 8]));
     assert!(isolate.post(vec![String::from("Dart"); 1024]));
+    assert!(isolate.post(vec![
+        vec![String::from("Rust"); 8],
+        vec![String::from("Dart"); 1024]
+    ]));
+    assert!(isolate.post(vec![
+        vec![
+            vec![String::from("Rust"); 8],
+            vec![String::from("Dart"); 1024]
+        ],
+        vec![
+            vec![String::from("Rust"); 8],
+            vec![String::from("Dart"); 1024]
+        ]
+    ]));
     assert!(isolate.post(vec![42i8; 100]));
     assert!(isolate.post(vec![42u8; 100]));
     assert!(isolate.post(vec![42i16; 100]));
@@ -174,10 +188,14 @@ fn return_anyhow_error() -> anyhow::Result<()> {
     Err(anyhow::anyhow!("sample error"))
 }
 
-fn return_backtrace() -> backtrace::Backtrace { backtrace::Backtrace::new() }
+fn return_backtrace() -> backtrace::Backtrace {
+    backtrace::Backtrace::new()
+}
 
 #[cfg(test)]
 mod tests {
     #[test]
-    fn can_run_valgrind_main() { super::main(); }
+    fn can_run_valgrind_main() {
+        super::main();
+    }
 }
