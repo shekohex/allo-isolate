@@ -164,16 +164,20 @@ fn main() {
         }
     }
 
+    #[cfg(feature = "anyhow")]
     assert!(isolate.post(return_anyhow_error()));
+    #[cfg(feature = "backtrace")]
     assert!(isolate.post(return_backtrace()));
 
     println!("all done!");
 }
 
+#[cfg(feature = "anyhow")]
 fn return_anyhow_error() -> anyhow::Result<()> {
     Err(anyhow::anyhow!("sample error"))
 }
 
+#[cfg(feature = "backtrace")]
 fn return_backtrace() -> backtrace::Backtrace { backtrace::Backtrace::new() }
 
 #[cfg(test)]
