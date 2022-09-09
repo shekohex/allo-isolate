@@ -188,14 +188,10 @@ fn return_anyhow_error() -> anyhow::Result<()> {
     Err(anyhow::anyhow!("sample error"))
 }
 
-fn return_backtrace() -> backtrace::Backtrace {
-    backtrace::Backtrace::new()
-}
+fn return_backtrace() -> backtrace::Backtrace { backtrace::Backtrace::new() }
 
 #[cfg(test)]
 mod tests {
     #[test]
-    fn can_run_valgrind_main() {
-        super::main();
-    }
+    fn can_run_valgrind_main() { super::main(); }
 }
