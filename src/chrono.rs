@@ -1,3 +1,7 @@
+//! chrono types
+//!
+//! based on Dart VM, microseconds unit is used
+
 use crate::{ffi::DartCObject, IntoDart};
 
 impl<T> IntoDart for chrono::DateTime<T>
