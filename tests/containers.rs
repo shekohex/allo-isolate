@@ -169,7 +169,13 @@ fn main() {
     #[cfg(feature = "backtrace")]
     assert!(isolate.post(return_backtrace()));
     #[cfg(feature = "chrono")]
-    assert!(isolate.post(return_chrono()));
+    assert!(isolate.post(return_chrono_date_time_utc()));
+    #[cfg(feature = "chrono")]
+    assert!(isolate.post(return_chrono_date_time_local()));
+    #[cfg(feature = "chrono")]
+    assert!(isolate.post(return_chrono_date_time_east()));
+    #[cfg(feature = "chrono")]
+    assert!(isolate.post(return_chrono_duration()));
 
     println!("all done!");
 }
@@ -183,7 +189,24 @@ fn return_anyhow_error() -> anyhow::Result<()> {
 fn return_backtrace() -> backtrace::Backtrace { backtrace::Backtrace::new() }
 
 #[cfg(feature = "chrono")]
-fn return_chrono() -> chrono::DateTime<chrono::Utc> { chrono::Utc::now() }
+fn return_chrono_date_time_utc() -> chrono::DateTime<chrono::Utc> {
+    chrono::Utc::now()
+}
+#[cfg(feature = "chrono")]
+fn return_chrono_date_time_local() -> chrono::DateTime<chrono::Local> {
+    chrono::Local::now()
+}
+#[cfg(feature = "chrono")]
+fn return_chrono_date_time_east() -> chrono::DateTime<chrono::FixedOffset> {
+    use chrono::TimeZone;
+    chrono::FixedOffset::east(7 * 3600)
+        .ymd(2016, 11, 08)
+        .and_hms(0, 0, 0)
+
+    // todo!()
+}
+#[cfg(feature = "chrono")]
+fn return_chrono_duration() -> chrono::Duration { chrono::Duration::hours(24) }
 
 #[cfg(test)]
 mod tests {
