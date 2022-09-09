@@ -355,10 +355,3 @@ impl<T> IntoDart for *mut T {
         }
     }
 }
-
-#[cfg(feature = "chrono")]
-impl IntoDart for chrono::DateTime<chrono::Utc> {
-    fn into_dart(self) -> DartCObject {
-        self.timestamp_micros().into_dart()
-    }
-}

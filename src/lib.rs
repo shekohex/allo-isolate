@@ -39,6 +39,9 @@ mod into_dart_extra;
 #[cfg(feature = "catch-unwind")]
 mod catch_unwind;
 
+#[cfg(feature = "chrono")]
+mod chrono;
+
 pub mod ffi;
 
 // Please don't use `AtomicPtr` here
