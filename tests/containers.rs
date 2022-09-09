@@ -183,9 +183,7 @@ fn return_anyhow_error() -> anyhow::Result<()> {
 fn return_backtrace() -> backtrace::Backtrace { backtrace::Backtrace::new() }
 
 #[cfg(feature = "chrono")]
-fn return_chrono() -> chrono::DateTime<chrono::Utc> {
-    chrono::Utc::now()
-}
+fn return_chrono() -> chrono::DateTime<chrono::Utc> { chrono::Utc::now() }
 
 #[cfg(test)]
 mod tests {
