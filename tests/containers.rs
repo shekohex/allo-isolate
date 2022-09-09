@@ -173,8 +173,6 @@ fn main() {
     #[cfg(feature = "chrono")]
     assert!(isolate.post(return_chrono_date_time_local()));
     #[cfg(feature = "chrono")]
-    assert!(isolate.post(return_chrono_date_time_east()));
-    #[cfg(feature = "chrono")]
     assert!(isolate.post(return_chrono_duration()));
 
     println!("all done!");
@@ -195,15 +193,6 @@ fn return_chrono_date_time_utc() -> chrono::DateTime<chrono::Utc> {
 #[cfg(feature = "chrono")]
 fn return_chrono_date_time_local() -> chrono::DateTime<chrono::Local> {
     chrono::Local::now()
-}
-#[cfg(feature = "chrono")]
-fn return_chrono_date_time_east() -> chrono::DateTime<chrono::FixedOffset> {
-    use chrono::TimeZone;
-    chrono::FixedOffset::east(7 * 3600)
-        .ymd(2016, 11, 08)
-        .and_hms(0, 0, 0)
-
-    // todo!()
 }
 #[cfg(feature = "chrono")]
 fn return_chrono_duration() -> chrono::Duration { chrono::Duration::hours(24) }
