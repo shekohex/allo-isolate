@@ -10,3 +10,7 @@ where
 impl IntoDart for chrono::NaiveDateTime {
     fn into_dart(self) -> DartCObject { self.timestamp_micros().into_dart() }
 }
+
+impl IntoDart for chrono::Duration {
+    fn into_dart(self) -> DartCObject { self.num_microseconds().into_dart() }
+}
