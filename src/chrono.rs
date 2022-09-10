@@ -7,7 +7,7 @@ use crate::{ffi::DartCObject, IntoDart};
 impl IntoDart for chrono::DateTime<chrono::Utc> {
     /// on the other side of FFI, value should be reconstructed like:
     ///
-    /// - hydrate into Dart [DateTime](https://api.flutter.dev/flutter/dart-core/DateTime/DateTime.fromMicrosecondsSinceEpoch.html)
+    /// - hydrate into Dart [DateTime](https://api.dart.dev/stable/2.18.0/dart-core/DateTime/DateTime.fromMicrosecondsSinceEpoch.html)
     ///   ```dart,ignore
     ///   DateTime.fromMicrosecondsSinceEpoch(raw, isUtc: true);
     ///   ```
@@ -19,14 +19,14 @@ impl IntoDart for chrono::DateTime<chrono::Utc> {
     ///   chrono::DateTime::<chrono::Utc>::from_utc(chrono::NaiveDateTime::from_timestamp(s, ns), chrono::Utc);
     ///   ```
     ///
-    ///   note that it could overflow under the same conditions as of [chrono::NaiveDateTime::from_timestamp](https://docs.rs/chrono/latest/chrono/naive/struct.NaiveDateTime.html#method.from_timestamp)
+    ///   note that it could overflow under the same conditions as of [chrono::NaiveDateTime::from_timestamp](https://docs.rs/chrono/0.4.22/chrono/naive/struct.NaiveDateTime.html#method.from_timestamp)
     fn into_dart(self) -> DartCObject { self.timestamp_micros().into_dart() }
 }
 
 impl IntoDart for chrono::DateTime<chrono::Local> {
     /// on the other side of FFI, value should be reconstructed like:
     ///
-    /// - hydrate into Dart [DateTime](https://api.flutter.dev/flutter/dart-core/DateTime/DateTime.fromMicrosecondsSinceEpoch.html)
+    /// - hydrate into Dart [DateTime](https://api.dart.dev/stable/2.18.0/dart-core/DateTime/DateTime.fromMicrosecondsSinceEpoch.html)
     ///   ```dart,ignore
     ///   DateTime.fromMicrosecondsSinceEpoch(raw, isUtc: false);
     ///   ```
@@ -38,19 +38,20 @@ impl IntoDart for chrono::DateTime<chrono::Local> {
     ///   chrono::DateTime::<chrono::Local>::from_local(chrono::NaiveDateTime::from_timestamp(s, ns), chrono::Local);
     ///   ```
     ///
-    ///   note that it could overflow under the same conditions as of [chrono::NaiveDateTime::from_timestamp](https://docs.rs/chrono/latest/chrono/naive/struct.NaiveDateTime.html#method.from_timestamp)
+    ///   note that it could overflow under the same conditions as of [chrono::NaiveDateTime::from_timestamp](https://docs.rs/chrono/0.4.22/chrono/naive/struct.NaiveDateTime.html#method.from_timestamp)
     fn into_dart(self) -> DartCObject { self.timestamp_micros().into_dart() }
 }
 
 impl IntoDart for chrono::NaiveDateTime {
-    /// on the other side of FFI, value should be reconstructed like [DateTime](chrono::DateTime)::<[Local](chrono::Local)>
+    /// on the other side of FFI, value should be reconstructed like
+    /// [DateTime](chrono::DateTime)::<[Local](chrono::Local)>
     fn into_dart(self) -> DartCObject { self.timestamp_micros().into_dart() }
 }
 
 impl IntoDart for chrono::Duration {
     /// on the other side of FFI, value should be reconstructed like:
     ///
-    /// - hydrate into Dart [Duration](https://api.flutter.dev/flutter/dart-core/Duration/Duration.html)
+    /// - hydrate into Dart [Duration](https://api.dart.dev/stable/2.18.0/dart-core/Duration/Duration.html)
     ///   ```dart,ignore
     ///   Duration(microseconds: raw);
     ///   ```
