@@ -35,6 +35,7 @@ impl IntoDart for chrono::DateTime<chrono::Local> {
 }
 
 impl IntoDart for chrono::NaiveDateTime {
+    /// on the other side of FFI, value should be reconstructed like [DateTime](chrono::DateTime)::<[Local](chrono::Local)>
     fn into_dart(self) -> DartCObject { self.timestamp_micros().into_dart() }
 }
 
