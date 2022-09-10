@@ -114,6 +114,20 @@ fn main() {
 
     assert!(isolate.post(vec![String::from("Rust"); 8]));
     assert!(isolate.post(vec![String::from("Dart"); 1024]));
+    assert!(isolate.post(vec![
+        vec![String::from("Rust"); 8],
+        vec![String::from("Dart"); 1024]
+    ]));
+    assert!(isolate.post(vec![
+        vec![
+            vec![String::from("Rust"); 8],
+            vec![String::from("Dart"); 1024]
+        ],
+        vec![
+            vec![String::from("Rust"); 8],
+            vec![String::from("Dart"); 1024]
+        ]
+    ]));
     assert!(isolate.post(vec![42i8; 100]));
     assert!(isolate.post(vec![42u8; 100]));
     assert!(isolate.post(vec![42i16; 100]));
