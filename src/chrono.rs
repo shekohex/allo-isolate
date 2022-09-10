@@ -15,7 +15,7 @@ impl IntoDart for chrono::DateTime<chrono::Utc> {
     /// - hydrate into Rust [DateTime](chrono::DateTime)::<[Utc](chrono::Utc)>
     ///   ```rust,ignore
     ///   let s = (raw / 1_000_000) as i64;
-    ///   let ns = (raw % 1_000_000 * 1_000) as u32;
+    ///   let ns = (raw.rem_euclid(1_000_000) * 1_000) as u32;
     ///   chrono::DateTime::<chrono::Utc>::from_utc(chrono::NaiveDateTime::from_timestamp(s, ns), chrono::Utc);
     ///   ```
     /// 
@@ -34,7 +34,7 @@ impl IntoDart for chrono::DateTime<chrono::Local> {
     /// - hydrate into Rust [DateTime](chrono::DateTime)::<[Local](chrono::Local)>
     ///   ```rust,ignore
     ///   let s = (raw / 1_000_000) as i64;
-    ///   let ns = (raw % 1_000_000 * 1_000) as u32;
+    ///   let ns = (raw.rem_euclid(1_000_000) * 1_000) as u32;
     ///   chrono::DateTime::<chrono::Local>::from_local(chrono::NaiveDateTime::from_timestamp(s, ns), chrono::Local);
     ///   ```
     /// 
