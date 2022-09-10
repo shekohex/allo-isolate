@@ -248,6 +248,8 @@ where
     }
 }
 
+impl<T> IntoDartExceptPrimitive for Vec<T> where T: IntoDartExceptPrimitive {}
+
 impl<T, const N: usize> IntoDart for ZeroCopyBuffer<[T; N]>
 where
     T: DartTypedDataTypeTrait,
