@@ -11,6 +11,7 @@ impl IntoDart for chrono::DateTime<chrono::Utc> {
     ///   ```dart,ignore
     ///   DateTime.fromMicrosecondsSinceEpoch(raw, isUtc: true);
     ///   ```
+    ///   > beware that conversion is lossy, see more details in [Dart SDK issue](https://github.com/dart-lang/sdk/issues/44876).
     ///
     /// - hydrate into Rust [DateTime](chrono::DateTime)::<[Utc](chrono::Utc)>
     ///   ```rust,ignore
@@ -30,6 +31,7 @@ impl IntoDart for chrono::DateTime<chrono::Local> {
     ///   ```dart,ignore
     ///   DateTime.fromMicrosecondsSinceEpoch(raw, isUtc: false);
     ///   ```
+    ///   > beware that conversion is lossy, see more details in [Dart SDK issue](https://github.com/dart-lang/sdk/issues/44876).
     ///
     /// - hydrate into Rust [DateTime](chrono::DateTime)::<[Local](chrono::Local)>
     ///   ```rust,ignore
