@@ -14,8 +14,12 @@ impl IntoDart for chrono::DateTime<chrono::Utc> {
     ///
     /// - hydrate into Rust [DateTime](chrono::DateTime)::<[Utc](chrono::Utc)>
     ///   ```rust,ignore
-    ///   chrono::DateTime::<chrono::Utc>::from_utc(chrono::NaiveDateTime::from_timestamp(0, raw * 1_000), chrono::Utc);
+    ///   let s = (raw / 1_000_000) as i64;
+    ///   let ns = (raw % 1_000_000 * 1_000) as u32;
+    ///   chrono::DateTime::<chrono::Utc>::from_utc(chrono::NaiveDateTime::from_timestamp(s, ns), chrono::Utc);
     ///   ```
+    /// 
+    ///   note that it could overflow under the same conditions as of [chrono::NaiveDateTime::from_timestamp](https://docs.rs/chrono/latest/chrono/naive/struct.NaiveDateTime.html#method.from_timestamp)
     fn into_dart(self) -> DartCObject { self.timestamp_micros().into_dart() }
 }
 
@@ -29,8 +33,12 @@ impl IntoDart for chrono::DateTime<chrono::Local> {
     ///
     /// - hydrate into Rust [DateTime](chrono::DateTime)::<[Local](chrono::Local)>
     ///   ```rust,ignore
-    ///   chrono::DateTime::<chrono::Local>::from_local(chrono::NaiveDateTime::from_timestamp(0, raw * 1_000), chrono::Local);
+    ///   let s = (raw / 1_000_000) as i64;
+    ///   let ns = (raw % 1_000_000 * 1_000) as u32;
+    ///   chrono::DateTime::<chrono::Local>::from_local(chrono::NaiveDateTime::from_timestamp(s, ns), chrono::Local);
     ///   ```
+    /// 
+    ///   note that it could overflow under the same conditions as of [chrono::NaiveDateTime::from_timestamp](https://docs.rs/chrono/latest/chrono/naive/struct.NaiveDateTime.html#method.from_timestamp)
     fn into_dart(self) -> DartCObject { self.timestamp_micros().into_dart() }
 }
 
