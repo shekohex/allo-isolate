@@ -11,7 +11,6 @@ impl IntoDart for chrono::DateTime<chrono::Utc> {
     ///   ```dart,ignore
     ///   DateTime.fromMicrosecondsSinceEpoch(raw, isUtc: true);
     ///   ```
-    ///   > beware that conversion is lossy, see more details in [Dart SDK issue](https://github.com/dart-lang/sdk/issues/44876).
     ///
     /// - hydrate into Rust [DateTime](chrono::DateTime)::<[Utc](chrono::Utc)>
     ///   ```rust,ignore
@@ -19,7 +18,7 @@ impl IntoDart for chrono::DateTime<chrono::Utc> {
     ///   let ns = (raw.rem_euclid(1_000_000) * 1_000) as u32;
     ///   chrono::DateTime::<chrono::Utc>::from_utc(chrono::NaiveDateTime::from_timestamp(s, ns), chrono::Utc);
     ///   ```
-    /// 
+    ///
     ///   note that it could overflow under the same conditions as of [chrono::NaiveDateTime::from_timestamp](https://docs.rs/chrono/latest/chrono/naive/struct.NaiveDateTime.html#method.from_timestamp)
     fn into_dart(self) -> DartCObject { self.timestamp_micros().into_dart() }
 }
@@ -31,7 +30,6 @@ impl IntoDart for chrono::DateTime<chrono::Local> {
     ///   ```dart,ignore
     ///   DateTime.fromMicrosecondsSinceEpoch(raw, isUtc: false);
     ///   ```
-    ///   > beware that conversion is lossy, see more details in [Dart SDK issue](https://github.com/dart-lang/sdk/issues/44876).
     ///
     /// - hydrate into Rust [DateTime](chrono::DateTime)::<[Local](chrono::Local)>
     ///   ```rust,ignore
@@ -39,7 +37,7 @@ impl IntoDart for chrono::DateTime<chrono::Local> {
     ///   let ns = (raw.rem_euclid(1_000_000) * 1_000) as u32;
     ///   chrono::DateTime::<chrono::Local>::from_local(chrono::NaiveDateTime::from_timestamp(s, ns), chrono::Local);
     ///   ```
-    /// 
+    ///
     ///   note that it could overflow under the same conditions as of [chrono::NaiveDateTime::from_timestamp](https://docs.rs/chrono/latest/chrono/naive/struct.NaiveDateTime.html#method.from_timestamp)
     fn into_dart(self) -> DartCObject { self.timestamp_micros().into_dart() }
 }
