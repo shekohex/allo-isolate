@@ -8,9 +8,7 @@ impl IntoDart for chrono::DateTime<chrono::Utc> {
     /// on the other side of FFI, value should be reconstructed like:
     ///
     /// - hydrate into Dart [DateTime](https://api.dart.dev/stable/2.18.0/dart-core/DateTime/DateTime.fromMicrosecondsSinceEpoch.html)
-    ///   ```dart,ignore
-    ///   DateTime.fromMicrosecondsSinceEpoch(raw, isUtc: true);
-    ///   ```
+    ///   `DateTime.fromMicrosecondsSinceEpoch(raw, isUtc: true);`
     ///
     /// - hydrate into Rust [DateTime](chrono::DateTime)::<[Utc](chrono::Utc)>
     ///   ```rust,ignore
@@ -27,9 +25,7 @@ impl IntoDart for chrono::DateTime<chrono::Local> {
     /// on the other side of FFI, value should be reconstructed like:
     ///
     /// - hydrate into Dart [DateTime](https://api.dart.dev/stable/2.18.0/dart-core/DateTime/DateTime.fromMicrosecondsSinceEpoch.html)
-    ///   ```dart,ignore
-    ///   DateTime.fromMicrosecondsSinceEpoch(raw, isUtc: false);
-    ///   ```
+    ///   `DateTime.fromMicrosecondsSinceEpoch(raw, isUtc: false);`
     ///
     /// - hydrate into Rust [DateTime](chrono::DateTime)::<[Local](chrono::Local)>
     ///   ```rust,ignore
@@ -52,13 +48,9 @@ impl IntoDart for chrono::Duration {
     /// on the other side of FFI, value should be reconstructed like:
     ///
     /// - hydrate into Dart [Duration](https://api.dart.dev/stable/2.18.0/dart-core/Duration/Duration.html)
-    ///   ```dart,ignore
-    ///   Duration(microseconds: raw);
-    ///   ```
+    ///   `Duration(microseconds: raw);`
     ///
     /// - hydrate into Rust [Duration](chrono::Duration)
-    ///   ```rust,ignore
-    ///   chrono::Duration::from_microseconds(raw);
-    ///   ```
+    /// `chrono::Duration::from_microseconds(raw);`
     fn into_dart(self) -> DartCObject { self.num_microseconds().into_dart() }
 }
