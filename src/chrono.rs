@@ -51,6 +51,6 @@ impl IntoDart for chrono::Duration {
     ///   `Duration(microseconds: raw);`
     ///
     /// - hydrate into Rust [Duration](chrono::Duration)
-    /// `chrono::Duration::from_microseconds(raw);`
+    /// `chrono::Duration::microseconds(raw);`
     fn into_dart(self) -> DartCObject { self.num_microseconds().into_dart() }
 }
