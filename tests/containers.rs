@@ -183,13 +183,12 @@ fn main() {
     #[cfg(feature = "backtrace")]
     assert!(isolate.post(return_backtrace()));
     #[cfg(feature = "chrono")]
-    assert!(isolate.post(return_chrono_naive_date_time()));
-    #[cfg(feature = "chrono")]
-    assert!(isolate.post(return_chrono_date_time_utc()));
-    #[cfg(feature = "chrono")]
-    assert!(isolate.post(return_chrono_date_time_local()));
-    #[cfg(feature = "chrono")]
-    assert!(isolate.post(return_chrono_duration()));
+    {
+    	assert!(isolate.post(return_chrono_naive_date_time()));
+    	assert!(isolate.post(return_chrono_date_time_utc()));
+    	assert!(isolate.post(return_chrono_date_time_local()));
+    	assert!(isolate.post(return_chrono_duration()));
+    }
 
     println!("all done!");
 }
