@@ -178,17 +178,43 @@ fn main() {
         }
     }
 
+    #[cfg(feature = "anyhow")]
     assert!(isolate.post(return_anyhow_error()));
+    #[cfg(feature = "backtrace")]
     assert!(isolate.post(return_backtrace()));
+    #[cfg(feature = "chrono")]
+    {
+        assert!(isolate.post(return_chrono_naive_date_time()));
+        assert!(isolate.post(return_chrono_date_time_utc()));
+        assert!(isolate.post(return_chrono_date_time_local()));
+        assert!(isolate.post(return_chrono_duration()));
+    }
 
     println!("all done!");
 }
 
+#[cfg(feature = "anyhow")]
 fn return_anyhow_error() -> anyhow::Result<()> {
     Err(anyhow::anyhow!("sample error"))
 }
 
+#[cfg(feature = "backtrace")]
 fn return_backtrace() -> backtrace::Backtrace { backtrace::Backtrace::new() }
+
+#[cfg(feature = "chrono")]
+fn return_chrono_naive_date_time() -> chrono::NaiveDateTime {
+    chrono::NaiveDate::from_ymd(2016, 7, 8).and_hms_micro(9, 10, 11, 123_456)
+}
+#[cfg(feature = "chrono")]
+fn return_chrono_date_time_utc() -> chrono::DateTime<chrono::Utc> {
+    chrono::Utc::now()
+}
+#[cfg(feature = "chrono")]
+fn return_chrono_date_time_local() -> chrono::DateTime<chrono::Local> {
+    chrono::Local::now()
+}
+#[cfg(feature = "chrono")]
+fn return_chrono_duration() -> chrono::Duration { chrono::Duration::hours(24) }
 
 #[cfg(test)]
 mod tests {
