@@ -29,7 +29,7 @@ fastrand = "^1.3"
 [[example]]
 name = "containers"
 path = "tests/containers.rs"
-required-features = ["anyhow", "backtrace", "chrono"]
+required-features = ["anyhow", "backtrace", "chrono", "uuid"]
 
 [features]
 default = []
