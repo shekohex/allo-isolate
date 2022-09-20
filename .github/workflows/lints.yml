@@ -16,12 +16,19 @@ jobs:
           profile: minimal
           toolchain: nightly
           override: true
-          components: rustfmt, clippy
+          components: clippy
+
+      - name: Install stable toolchain (rustfmt)
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          components: rustfmt
 
       - name: Run cargo fmt
         uses: actions-rs/cargo@v1
         with:
           command: fmt
+          toolchain: stable
           args: --all -- --check
 
       - name: Run cargo clippy
