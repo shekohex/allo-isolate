@@ -199,7 +199,9 @@ fn return_anyhow_error() -> anyhow::Result<()> {
 }
 
 #[cfg(feature = "backtrace")]
-fn return_backtrace() -> backtrace::Backtrace { backtrace::Backtrace::new() }
+fn return_backtrace() -> backtrace::Backtrace {
+    backtrace::Backtrace::new()
+}
 
 #[cfg(feature = "chrono")]
 fn return_chrono_naive_date_time() -> chrono::NaiveDateTime {
@@ -214,10 +216,14 @@ fn return_chrono_date_time_local() -> chrono::DateTime<chrono::Local> {
     chrono::Local::now()
 }
 #[cfg(feature = "chrono")]
-fn return_chrono_duration() -> chrono::Duration { chrono::Duration::hours(24) }
+fn return_chrono_duration() -> chrono::Duration {
+    chrono::Duration::hours(24)
+}
 
 #[cfg(test)]
 mod tests {
     #[test]
-    fn can_run_valgrind_main() { super::main(); }
+    fn can_run_valgrind_main() {
+        super::main();
+    }
 }
