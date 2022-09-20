@@ -2,8 +2,8 @@
 name = "allo-isolate"
 version = "0.1.14-beta.2"
 authors = [
-    "Sunshine Foundation Developers",
-    "Shady Khalifa <dev@shadykhalifa.me>",
+  "Sunshine Foundation Developers",
+  "Shady Khalifa <dev@shadykhalifa.me>",
 ]
 edition = "2018"
 description = "Run Multithreaded Rust along with Dart VM (in isolate)."
