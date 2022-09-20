@@ -1,6 +1,10 @@
 //! chrono types
 //!
 //! based on Dart VM, microseconds unit is used
+//! 
+//! recommendations below implies UTC based conversions,
+//! as these are generally easier to work with.
+//! > see [timestamp_micros](https://docs.rs/chrono/0.4.20/chrono/naive/struct.NaiveDateTime.html?search=timestamp_micros#method.timestamp_micros)
 
 use crate::{ffi::DartCObject, IntoDart};
 
