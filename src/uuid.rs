@@ -18,3 +18,14 @@ impl IntoDart for uuid::Uuid {
         self.as_bytes().to_vec().into_dart()
     }
 }
+
+impl IntoDart for Vec<uuid::Uuid> {
+    /// delegate to `Vec<u8>` implementation but concatenates outputs in a single Vec<u8>
+    fn into_dart(self) -> DartCObject {
+        self.into_iter()
+            .map(|x| x.as_bytes().to_vec())
+            .flatten()
+            .collect::<Vec<u8>>()
+            .into_dart()
+    }
+}
