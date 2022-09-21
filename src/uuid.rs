@@ -42,10 +42,11 @@ impl IntoDart for Vec<uuid::Uuid> {
     ///   .collect();
     ///   ```
     fn into_dart(self) -> DartCObject {
-        self.into_iter()
-            .map(|x| x.as_bytes().to_vec())
-            .flatten()
-            .collect::<Vec<u8>>()
-            .into_dart()
+        use std::io::Write;
+        let mut buffer = Vec::<u8>::with_capacity(self.len() * 16);
+        for id in self {
+            let _ = buffer.write(id.as_bytes());
+        }
+        buffer.into_dart()
     }
 }
