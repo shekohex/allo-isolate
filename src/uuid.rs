@@ -4,7 +4,7 @@ use crate::{ffi::DartCObject, IntoDart};
 
 impl IntoDart for uuid::Uuid {
     /// delegate to `Vec<u8>` implementation
-    /// 
+    ///
     /// on the other side of FFI, value should be reconstructed like:
     ///
     /// - hydrate into Dart [UuidValue](https://pub.dev/documentation/uuid/latest/uuid/UuidValue-class.html)
