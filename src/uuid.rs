@@ -24,7 +24,7 @@ impl IntoDart for Vec<uuid::Uuid> {
     ///
     /// on the other side of FFI, value should be reconstructed like:
     ///
-    /// - hydrate into Dart [UuidValue](https://pub.dev/documentation/uuid/latest/uuid/UuidValue-class.html)
+    /// - hydrate into Dart List<[UuidValue](https://pub.dev/documentation/uuid/latest/uuid/UuidValue-class.html)>
     ///   ```dart
     ///   final count = raw.lengthInBytes / 16;
     ///   var List<UuidValue> ids = List(growable: true);
@@ -33,7 +33,7 @@ impl IntoDart for Vec<uuid::Uuid> {
     ///   }
     ///   ```
     ///
-    /// - hydrate into Rust [Uuid](uuid::Uuid)
+    /// - hydrate into Rust Vec<[Uuid](uuid::Uuid)>
     ///   ```rust,ignore
     ///   raw
     ///   .as_slice()
