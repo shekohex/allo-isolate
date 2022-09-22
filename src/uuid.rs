@@ -20,7 +20,7 @@ impl IntoDart for uuid::Uuid {
 }
 
 impl IntoDart for Vec<uuid::Uuid> {
-    /// delegate to `Vec<u8>` implementation but concatenates outputs in a single Vec<u8>
+    /// ⚠️ concatenated in a single `Vec<u8>` for performance optimization
     ///
     /// on the other side of FFI, value should be reconstructed like:
     ///
