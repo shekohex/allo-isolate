@@ -40,6 +40,8 @@ impl IntoDart for Vec<uuid::Uuid> {
     ///   .map(|x: &[u8]| uuid::Uuid::from_bytes(*<&[u8] as std::convert::TryInto<&[u8;16]>>::try_into(x).expect("invalid uuid slice")))
     ///   .collect();
     ///   ```
+    /// 
+    /// note that buffer could end up being incomplete under the same conditions as of [std::io::Write::write](https://doc.rust-lang.org/std/io/trait.Write.html#tymethod.write).
     fn into_dart(self) -> DartCObject {
         use std::io::Write;
         let mut buffer = Vec::<u8>::with_capacity(self.len() * 16);
