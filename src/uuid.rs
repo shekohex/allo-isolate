@@ -44,9 +44,7 @@ impl IntoDart for Vec<uuid::Uuid> {
         use std::io::Write;
         let mut buffer = Vec::<u8>::with_capacity(self.len() * 16);
         for id in self {
-            buffer
-                .write(id.as_bytes())
-                .expect("write uuids bytes to buffer");
+            let _ = buffer.write(id.as_bytes());
         }
         buffer.into_dart()
     }
