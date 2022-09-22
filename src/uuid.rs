@@ -26,11 +26,10 @@ impl IntoDart for Vec<uuid::Uuid> {
     ///
     /// - hydrate into Dart List<[UuidValue](https://pub.dev/documentation/uuid/latest/uuid/UuidValue-class.html)>
     ///   ```dart
-    ///   final count = raw.lengthInBytes / 16;
-    ///   var List<UuidValue> ids = List(growable: true);
-    ///   for (var i = 0; i < count; i += 16) {
-    ///     ids.add(UuidValue.fromByteList(Uint8List.view(raw.buffer, i * 16, 16)))
-    ///   }
+    ///   return List<UuidValue>.generate(
+    ///     raw.lengthInBytes / 16,
+    ///     (int i) => UuidValue.fromByteList(Uint8List.view(raw.buffer, i * 16, 16)),
+    ///     growable: false);
     ///   ```
     ///
     /// - hydrate into Rust Vec<[Uuid](uuid::Uuid)>
