@@ -42,6 +42,9 @@ mod catch_unwind;
 #[cfg(feature = "chrono")]
 mod chrono;
 
+#[cfg(feature = "uuid")]
+mod uuid;
+
 pub mod ffi;
 
 // Please don't use `AtomicPtr` here

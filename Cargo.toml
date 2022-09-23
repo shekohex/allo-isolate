@@ -2,8 +2,8 @@
 name = "allo-isolate"
 version = "0.1.14-beta.2"
 authors = [
-    "Sunshine Foundation Developers",
-    "Shady Khalifa <dev@shadykhalifa.me>",
+  "Sunshine Foundation Developers",
+  "Shady Khalifa <dev@shadykhalifa.me>",
 ]
 edition = "2018"
 description = "Run Multithreaded Rust along with Dart VM (in isolate)."
@@ -20,15 +20,18 @@ pin-project = { version = "1.0.8", optional = true }
 anyhow = { version = "1.0.58", optional = true }
 backtrace = { version = "0.3.66", optional = true }
 chrono = { version = "0.4.20", optional = true }
+uuid = { version = "1.1.2", optional = true }
 
 [dev-dependencies]
 fastrand = "^1.3"
+criterion = "0.3"
+uuid = { version = "1.1.2", features = ["v4"] }
 
 # These are used for tests
 [[example]]
 name = "containers"
 path = "tests/containers.rs"
-required-features = ["anyhow", "backtrace", "chrono"]
+required-features = ["anyhow", "backtrace", "chrono", "uuid"]
 
 [features]
 default = []
@@ -36,3 +39,8 @@ catch-unwind = ["pin-project"]
 
 [package.metadata.docs.rs]
 all-features = true
+
+[[bench]]
+name = "uuid"
+harness = false
+required-features = ["uuid"]

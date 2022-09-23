@@ -189,6 +189,11 @@ fn main() {
         assert!(isolate.post(return_chrono_date_time_local()));
         assert!(isolate.post(return_chrono_duration()));
     }
+    #[cfg(feature = "uuid")]
+    {
+        assert!(isolate.post(return_uuid()));
+        assert!(isolate.post(return_uuids()))
+    }
 
     println!("all done!");
 }
@@ -218,6 +223,18 @@ fn return_chrono_date_time_local() -> chrono::DateTime<chrono::Local> {
 #[cfg(feature = "chrono")]
 fn return_chrono_duration() -> chrono::Duration {
     chrono::Duration::hours(24)
+}
+
+#[cfg(feature = "uuid")]
+fn return_uuid() -> uuid::Uuid {
+    uuid::Uuid::parse_str("550e8400-e29b-41d4-a716-446655440000").unwrap()
+}
+#[cfg(feature = "uuid")]
+fn return_uuids() -> Vec<uuid::Uuid> {
+    vec![
+        uuid::Uuid::parse_str("550e8400-e29b-41d4-a716-446655440000").unwrap(),
+        uuid::Uuid::parse_str("a1a2a3a4-b1b2-c1c2-d1d2-d3d4d5d6d7d8").unwrap(),
+    ]
 }
 
 #[cfg(test)]
