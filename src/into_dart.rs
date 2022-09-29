@@ -184,7 +184,7 @@ macro_rules! dart_typed_data_type_trait_impl {
 
             #[doc(hidden)]
             #[no_mangle]
-            unsafe extern "C" fn $free_zero_copy_buffer_func(
+            pub(crate) unsafe extern "C" fn $free_zero_copy_buffer_func(
                 isolate_callback_data: *mut c_void,
                 peer: *mut c_void,
             ) {
