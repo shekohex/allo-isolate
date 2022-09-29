@@ -80,3 +80,67 @@ impl IntoDart for chrono::Duration {
         self.num_microseconds().into_dart()
     }
 }
+
+impl IntoDart for Vec<chrono::DateTime<chrono::Utc>> {
+    fn into_dart(self) -> DartCObject {
+        self.iter()
+            .map(chrono::DateTime::<chrono::Utc>::timestamp_micros)
+            .collect::<Vec<_>>()
+            .into_dart()
+    }
+}
+
+impl<const N: usize> IntoDart for [chrono::DateTime<chrono::Utc>; N] {
+    fn into_dart(self) -> DartCObject {
+        let vec: Vec<_> = self.into();
+        vec.into_dart()
+    }
+}
+
+impl IntoDart for Vec<chrono::DateTime<chrono::Local>> {
+    fn into_dart(self) -> DartCObject {
+        self.iter()
+            .map(chrono::DateTime::<chrono::Local>::timestamp_micros)
+            .collect::<Vec<_>>()
+            .into_dart()
+    }
+}
+
+impl<const N: usize> IntoDart for [chrono::DateTime<chrono::Local>; N] {
+    fn into_dart(self) -> DartCObject {
+        let vec: Vec<_> = self.into();
+        vec.into_dart()
+    }
+}
+
+impl IntoDart for Vec<chrono::NaiveDateTime> {
+    fn into_dart(self) -> DartCObject {
+        self.iter()
+            .map(chrono::NaiveDateTime::timestamp_micros)
+            .collect::<Vec<_>>()
+            .into_dart()
+    }
+}
+
+impl<const N: usize> IntoDart for [chrono::NaiveDateTime; N] {
+    fn into_dart(self) -> DartCObject {
+        let vec: Vec<_> = self.into();
+        vec.into_dart()
+    }
+}
+
+impl IntoDart for Vec<chrono::Duration> {
+    fn into_dart(self) -> DartCObject {
+        self.iter()
+            .map(chrono::Duration::num_microseconds)
+            .collect::<Vec<_>>()
+            .into_dart()
+    }
+}
+
+impl<const N: usize> IntoDart for [chrono::Duration; N] {
+    fn into_dart(self) -> DartCObject {
+        let vec: Vec<_> = self.into();
+        vec.into_dart()
+    }
+}
