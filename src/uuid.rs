@@ -1,6 +1,10 @@
 //! uuid type
 
-use crate::{ffi::DartCObject, IntoDart};
+use crate::{
+    ffi::{DartCObject, DartHandleFinalizer, DartTypedDataType},
+    into_dart::{free_zero_copy_buffer_u8, DartTypedDataTypeTrait},
+    IntoDart,
+};
 
 impl IntoDart for uuid::Uuid {
     /// delegate to `Vec<u8>` implementation
@@ -49,5 +53,22 @@ impl IntoDart for Vec<uuid::Uuid> {
             let _ = buffer.write(id.as_bytes());
         }
         buffer.into_dart()
+    }
+}
+
+impl<const N: usize> IntoDart for [uuid::Uuid; N] {
+    fn into_dart(self) -> DartCObject {
+        let vec: Vec<_> = self.into();
+        vec.into_dart()
+    }
+}
+
+impl DartTypedDataTypeTrait for uuid::Uuid {
+    fn dart_typed_data_type() -> DartTypedDataType {
+        DartTypedDataType::Uint8
+    }
+
+    fn function_pointer_of_free_zero_copy_buffer() -> DartHandleFinalizer {
+        free_zero_copy_buffer_u8
     }
 }
