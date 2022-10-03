@@ -6,7 +6,11 @@
 //! as these are generally easier to work with.
 //! > see [timestamp_micros](https://docs.rs/chrono/0.4.20/chrono/naive/struct.NaiveDateTime.html?search=timestamp_micros#method.timestamp_micros)
 
-use crate::{ffi::DartCObject, IntoDart};
+use crate::{
+    ffi::{DartCObject, DartHandleFinalizer, DartTypedDataType},
+    into_dart::{free_zero_copy_buffer_i64, DartTypedDataTypeTrait},
+    IntoDart,
+};
 
 impl IntoDart for chrono::DateTime<chrono::Utc> {
     /// on the other side of FFI, value should be reconstructed like:
@@ -78,5 +82,99 @@ impl IntoDart for chrono::Duration {
     /// `chrono::Duration::microseconds(raw);`
     fn into_dart(self) -> DartCObject {
         self.num_microseconds().into_dart()
+    }
+}
+
+impl IntoDart for Vec<chrono::DateTime<chrono::Utc>> {
+    fn into_dart(self) -> DartCObject {
+        self.iter()
+            .map(chrono::DateTime::<chrono::Utc>::timestamp_micros)
+            .collect::<Vec<_>>()
+            .into_dart()
+    }
+}
+
+impl<const N: usize> IntoDart for [chrono::DateTime<chrono::Utc>; N] {
+    fn into_dart(self) -> DartCObject {
+        let vec: Vec<_> = self.into();
+        vec.into_dart()
+    }
+}
+
+impl DartTypedDataTypeTrait for chrono::DateTime<chrono::Utc> {
+    fn dart_typed_data_type() -> DartTypedDataType {
+        DartTypedDataType::Int64
+    }
+
+    fn function_pointer_of_free_zero_copy_buffer() -> DartHandleFinalizer {
+        free_zero_copy_buffer_i64
+    }
+}
+
+impl IntoDart for Vec<chrono::DateTime<chrono::Local>> {
+    fn into_dart(self) -> DartCObject {
+        self.iter()
+            .map(chrono::DateTime::<chrono::Local>::timestamp_micros)
+            .collect::<Vec<_>>()
+            .into_dart()
+    }
+}
+
+impl<const N: usize> IntoDart for [chrono::DateTime<chrono::Local>; N] {
+    fn into_dart(self) -> DartCObject {
+        let vec: Vec<_> = self.into();
+        vec.into_dart()
+    }
+}
+
+impl DartTypedDataTypeTrait for chrono::DateTime<chrono::Local> {
+    fn dart_typed_data_type() -> DartTypedDataType {
+        DartTypedDataType::Int64
+    }
+
+    fn function_pointer_of_free_zero_copy_buffer() -> DartHandleFinalizer {
+        free_zero_copy_buffer_i64
+    }
+}
+
+impl IntoDart for Vec<chrono::NaiveDateTime> {
+    fn into_dart(self) -> DartCObject {
+        self.iter()
+            .map(chrono::NaiveDateTime::timestamp_micros)
+            .collect::<Vec<_>>()
+            .into_dart()
+    }
+}
+
+impl<const N: usize> IntoDart for [chrono::NaiveDateTime; N] {
+    fn into_dart(self) -> DartCObject {
+        let vec: Vec<_> = self.into();
+        vec.into_dart()
+    }
+}
+
+impl DartTypedDataTypeTrait for chrono::NaiveDateTime {
+    fn dart_typed_data_type() -> DartTypedDataType {
+        DartTypedDataType::Int64
+    }
+
+    fn function_pointer_of_free_zero_copy_buffer() -> DartHandleFinalizer {
+        free_zero_copy_buffer_i64
+    }
+}
+
+impl IntoDart for Vec<chrono::Duration> {
+    fn into_dart(self) -> DartCObject {
+        self.iter()
+            .map(chrono::Duration::num_microseconds)
+            .collect::<Vec<_>>()
+            .into_dart()
+    }
+}
+
+impl<const N: usize> IntoDart for [chrono::Duration; N] {
+    fn into_dart(self) -> DartCObject {
+        let vec: Vec<_> = self.into();
+        vec.into_dart()
     }
 }
