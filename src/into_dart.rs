@@ -367,3 +367,9 @@ impl<T> IntoDart for *mut T {
         }
     }
 }
+
+impl IntoDart for char {
+    fn into_dart(self) -> DartCObject {
+        (self as u32).into_dart()
+    }
+}
