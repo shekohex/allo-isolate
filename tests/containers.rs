@@ -74,6 +74,7 @@ fn main() {
     assert!(isolate.post(42usize));
     assert!(isolate.post(true));
     assert!(isolate.post(false));
+    assert!(isolate.post('🎊'));
 
     // Create another isolate and port that still works
     let port = vm::port();
