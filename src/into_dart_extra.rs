@@ -65,3 +65,9 @@ impl IntoDart for usize {
         (self as u32 as i32).into_dart()
     }
 }
+
+impl IntoDart for char {
+    fn into_dart(self) -> DartCObject {
+        (self as u32).into_dart()
+    }
+}
