@@ -165,7 +165,7 @@ macro_rules! dart_typed_data_type_trait_impl {
                 }
             }
 
-            #[cfg(not(feature="prefer-zero-copy"))]
+            #[cfg(not(feature="zero-copy"))]
             impl IntoDart for Vec<$rust_type> {
                 fn into_dart(self) -> DartCObject {
                     let mut vec = ManuallyDrop::new(self);
