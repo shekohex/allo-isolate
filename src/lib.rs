@@ -24,6 +24,14 @@
 //! ### Example
 //!
 //! See [`flutterust`](https://github.com/shekohex/flutterust/tree/master/native/scrap-ffi) and how we used it in the `scrap` package to create a webscrapper using Rust and Flutter.
+//!
+//! ### Cargo Features
+//! - `catch-unwind`: Unwind the Rust stack after a panic, instead of stopping the thread.
+//! - `zero-copy`: Zero copy typed data by default without explicit `ZeroCopyBuffer`.
+//! For example, `Vec<u8>` in Rust will be moved to the Dart side
+//! as `UInt8List` without any copy operation,
+//! which can have performance benefits.
+
 /// Holds the Raw Dart FFI Types Required to send messages to Isolate
 use atomic::Atomic;
 use ffi::DartCObjectType;
