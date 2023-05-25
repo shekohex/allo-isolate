@@ -36,6 +36,7 @@ required-features = ["anyhow", "backtrace", "chrono", "uuid"]
 [features]
 default = []
 catch-unwind = ["pin-project"]
+zero-copy = []
 
 [package.metadata.docs.rs]
 all-features = true
