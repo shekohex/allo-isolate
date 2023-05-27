@@ -185,7 +185,7 @@ macro_rules! dart_typed_data_type_trait_impl {
             #[cfg(feature="zero-copy")]
             impl IntoDart for Vec<$rust_type> {
                 fn into_dart(self) -> DartCObject {
-                    let mut vec = self;
+                    let mut vec = ManuallyDrop::new(self);
                     vec.shrink_to_fit();
                     let length = vec.len();
                     assert_eq!(length, vec.capacity());
