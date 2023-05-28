@@ -25,7 +25,7 @@ jobs:
           toolchain: stable
           components: rustfmt
 
-      - name: Run tests without features
+      - name: Run cargo fmt without features
         uses: actions-rs/cargo@v1
         with:
           command: fmt
@@ -62,7 +62,7 @@ jobs:
           toolchain: stable
           components: rustfmt
 
-      - name: Run tests for feature ${{ matrix.features }}
+      - name: Run cargo fmt for feature ${{ matrix.features }}
         uses: actions-rs/cargo@v1
         with:
           command: fmt
