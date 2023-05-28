@@ -38,7 +38,7 @@ jobs:
           command: clippy
           args: -- -D warnings
   combo-with-feature:
-    name: Clippy + rustfmt (with features)
+    name: Clippy + rustfmt (with a feature)
     runs-on: ubuntu-latest
     strategy:
       matrix:
