@@ -67,10 +67,12 @@ jobs:
         with:
           command: fmt
           toolchain: stable
-          args: --all -- --check --features ${{ matrix.features }}
+          args: --all -- --check
+          features: ${{ matrix.features }}
 
       - name: Run clippy for feature ${{ matrix.features }}
         uses: actions-rs/cargo@v1
         with:
           command: clippy
-          args: -- -D warnings --features ${{ matrix.features }}
+          args: -- -D warnings
+          features: ${{ matrix.features }}
