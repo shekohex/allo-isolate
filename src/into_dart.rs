@@ -145,7 +145,7 @@ pub trait DartTypedDataTypeTrait {
     fn function_pointer_of_free_zero_copy_buffer() -> DartHandleFinalizer;
 }
 
-fn vec_to_dart_native_external_type_data<T>(
+fn vec_to_dart_native_external_typed_data<T>(
     vec_from_rust: Vec<T>,
 ) -> DartCObject
 where
@@ -211,7 +211,7 @@ macro_rules! dart_typed_data_type_trait_impl {
             #[cfg(feature="zero-copy")]
             impl IntoDart for Vec<$rust_type> {
                 fn into_dart(self) -> DartCObject {
-                    vec_to_dart_native_external_type_data(self)
+                    vec_to_dart_native_external_typed_data(self)
                 }
             }
 
@@ -256,7 +256,7 @@ where
     T: DartTypedDataTypeTrait,
 {
     fn into_dart(self) -> DartCObject {
-        vec_to_dart_native_external_type_data(self.0)
+        vec_to_dart_native_external_typed_data(self.0)
     }
 }
 
