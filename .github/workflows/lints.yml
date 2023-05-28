@@ -4,7 +4,7 @@ name: Nightly lints
 
 jobs:
   combo:
-    name: Clippy + rustfmt
+    name: Clippy + rustfmt (without features)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
@@ -25,15 +25,52 @@ jobs:
           toolchain: stable
           components: rustfmt
 
-      - name: Run cargo fmt
+      - name: Run tests without features
         uses: actions-rs/cargo@v1
         with:
           command: fmt
           toolchain: stable
           args: --all -- --check
 
-      - name: Run cargo clippy
+      - name: Run clippy without features
         uses: actions-rs/cargo@v1
         with:
           command: clippy
           args: -- -D warnings
+  combo-with-feature:
+    name: Clippy + rustfmt (with features)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        features: ["catch-unwind", "zero-copy"]
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install nightly toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: true
+          components: clippy
+
+      - name: Install stable toolchain (rustfmt)
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          components: rustfmt
+
+      - name: Run tests for feature ${{ matrix.features }}
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          toolchain: stable
+          args: --all -- --check --features ${{ matrix.features }}
+
+      - name: Run clippy for feature ${{ matrix.features }}
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: -- -D warnings --features ${{ matrix.features }}
