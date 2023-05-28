@@ -32,7 +32,7 @@ jobs:
           toolchain: stable
           args: --all -- --check
 
-      - name: Run clippy without features
+      - name: Run cargo clippy without features
         uses: actions-rs/cargo@v1
         with:
           command: clippy
@@ -70,7 +70,7 @@ jobs:
           args: --all -- --check
           features: ${{ matrix.features }}
 
-      - name: Run clippy for feature ${{ matrix.features }}
+      - name: Run cargo clippy for feature ${{ matrix.features }}
         uses: actions-rs/cargo@v1
         with:
           command: clippy
