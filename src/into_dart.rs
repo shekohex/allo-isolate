@@ -145,6 +145,32 @@ pub trait DartTypedDataTypeTrait {
     fn function_pointer_of_free_zero_copy_buffer() -> DartHandleFinalizer;
 }
 
+fn vec_to_dart_native_external_typed_data<T>(
+    vec_from_rust: Vec<T>,
+) -> DartCObject
+where
+    T: DartTypedDataTypeTrait,
+{
+    let mut vec = ManuallyDrop::new(vec_from_rust);
+    vec.shrink_to_fit();
+    let length = vec.len();
+    assert_eq!(length, vec.capacity());
+    let ptr = vec.as_mut_ptr();
+
+    DartCObject {
+        ty: DartCObjectType::DartExternalTypedData,
+        value: DartCObjectValue {
+            as_external_typed_data: DartNativeExternalTypedData {
+                ty: T::dart_typed_data_type(),
+                length: length as isize,
+                data: ptr as *mut u8,
+                peer: ptr as *mut c_void,
+                callback: T::function_pointer_of_free_zero_copy_buffer(),
+            },
+        },
+    }
+}
+
 macro_rules! dart_typed_data_type_trait_impl {
     ($($dart_type:path => $rust_type:ident + $free_zero_copy_buffer_func:ident),+) => {
         $(
@@ -185,24 +211,7 @@ macro_rules! dart_typed_data_type_trait_impl {
             #[cfg(feature="zero-copy")]
             impl IntoDart for Vec<$rust_type> {
                 fn into_dart(self) -> DartCObject {
-                    let mut vec = ManuallyDrop::new(self.0);
-                    vec.shrink_to_fit();
-                    let length = vec.len();
-                    assert_eq!(length, vec.capacity());
-                    let ptr = vec.as_mut_ptr();
-
-                    DartCObject {
-                        ty: DartCObjectType::DartExternalTypedData,
-                        value: DartCObjectValue {
-                            as_external_typed_data: DartNativeExternalTypedData {
-                                ty: $rust_type::dart_typed_data_type(),
-                                length: length as isize,
-                                data: ptr as *mut u8,
-                                peer: ptr as *mut c_void,
-                                callback: $rust_type::function_pointer_of_free_zero_copy_buffer(),
-                            },
-                        },
-                    }
+                    vec_to_dart_native_external_typed_data(self)
                 }
             }
 
@@ -247,24 +256,7 @@ where
     T: DartTypedDataTypeTrait,
 {
     fn into_dart(self) -> DartCObject {
-        let mut vec = ManuallyDrop::new(self.0);
-        vec.shrink_to_fit();
-        let length = vec.len();
-        assert_eq!(length, vec.capacity());
-        let ptr = vec.as_mut_ptr();
-
-        DartCObject {
-            ty: DartCObjectType::DartExternalTypedData,
-            value: DartCObjectValue {
-                as_external_typed_data: DartNativeExternalTypedData {
-                    ty: T::dart_typed_data_type(),
-                    length: length as isize,
-                    data: ptr as *mut u8,
-                    peer: ptr as *mut c_void,
-                    callback: T::function_pointer_of_free_zero_copy_buffer(),
-                },
-            },
-        }
+        vec_to_dart_native_external_typed_data(self.0)
     }
 }
 
