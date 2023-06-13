@@ -60,7 +60,7 @@ impl VMIsolate {
     fn exec(&mut self, object: *mut DartCObject) -> bool {
         use DartCObjectType::*;
         assert!(!object.is_null(), "got a null object");
-        let o = unsafe { &*object };
+        let o = unsafe { &mut *object };
         match o.ty {
             DartNull => {
                 DartCObject {
@@ -113,6 +113,12 @@ impl VMIsolate {
                 };
             },
             DartArray => {
+                // In a real application, the Dart VM would keep the array and its elements around
+                // and let GC eventually reclaim it. This prevents memory leaks e.g. resulting from external
+                // typed arrays nested inside of arrays and hence not being cleaned up.
+                unsafe {
+                    allo_isolate::ffi::run_destructors(o);
+                }
                 // do something with o
                 // I'm semulating that I copied some data into the VM here
                 let v: Vec<_> = vec![0u32; 0]

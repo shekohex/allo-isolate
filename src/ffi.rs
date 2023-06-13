@@ -221,3 +221,29 @@ impl Drop for DartCObject {
         }
     }
 }
+
+/// Exposed only for tests.
+#[doc(hidden)]
+pub unsafe fn run_destructors(obj: &mut DartCObject) {
+    use DartCObjectType::*;
+    match obj.ty {
+        DartExternalTypedData => unsafe {
+            (obj.value.as_external_typed_data.callback)(
+                obj.value.as_external_typed_data.data as *mut c_void,
+                obj.value.as_external_typed_data.peer,
+            )
+        },
+        DartArray => {
+            let items = unsafe {
+                std::slice::from_raw_parts_mut(
+                    obj.value.as_array.values,
+                    obj.value.as_array.length as usize,
+                )
+            };
+            for item in items {
+                run_destructors(&mut **item)
+            }
+        },
+        _ => {},
+    }
+}

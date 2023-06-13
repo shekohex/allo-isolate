@@ -34,8 +34,7 @@
 
 /// Holds the Raw Dart FFI Types Required to send messages to Isolate
 use atomic::Atomic;
-use ffi::DartCObjectType;
-use std::{ffi::c_void, future::Future, sync::atomic::Ordering};
+use std::{future::Future, sync::atomic::Ordering};
 
 pub use ffi::ZeroCopyBuffer;
 pub use into_dart::{IntoDart, IntoDartExceptPrimitive};
@@ -139,15 +138,9 @@ impl Isolate {
                 // Send the message
                 let result = func(self.port, ptr);
                 // free the object
-                let boxed_obj = Box::from_raw(ptr);
-                if !result
-                    && boxed_obj.ty == DartCObjectType::DartExternalTypedData
-                {
-                    (boxed_obj.value.as_external_typed_data.callback)(
-                        boxed_obj.value.as_external_typed_data.data
-                            as *mut c_void,
-                        boxed_obj.value.as_external_typed_data.peer,
-                    );
+                let mut boxed_obj = Box::from_raw(ptr);
+                if !result {
+                    ffi::run_destructors(boxed_obj.as_mut())
                 }
                 drop(boxed_obj);
                 // I like that dance haha
