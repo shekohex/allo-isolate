@@ -12,7 +12,7 @@ homepage = "https://github.com/sunshine-protocol/allo-isolate"
 license-file = "LICENSE"
 
 [dependencies]
-atomic = "0.5"
+atomic = "0.6"
 pin-project = { version = "1.0.8", optional = true }
 anyhow = { version = "1.0.58", optional = true }
 backtrace = { version = "0.3.66", optional = true }
