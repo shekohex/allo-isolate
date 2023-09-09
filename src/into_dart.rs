@@ -101,6 +101,8 @@ impl IntoDart for bool {
     }
 }
 
+impl IntoDartExceptPrimitive for bool {}
+
 impl IntoDart for String {
     fn into_dart(self) -> DartCObject {
         let s = CString::new(self).unwrap_or_default();
