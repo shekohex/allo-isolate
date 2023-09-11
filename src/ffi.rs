@@ -224,7 +224,7 @@ impl Drop for DartCObject {
 
 /// Exposed only for tests.
 #[doc(hidden)]
-pub unsafe fn run_destructors(obj: &mut DartCObject) {
+pub unsafe fn run_destructors(obj: &DartCObject) {
     use DartCObjectType::*;
     match obj.ty {
         DartExternalTypedData => unsafe {
@@ -241,7 +241,7 @@ pub unsafe fn run_destructors(obj: &mut DartCObject) {
                 )
             };
             for item in items {
-                run_destructors(&mut **item)
+                run_destructors(&**item)
             }
         },
         _ => {},
