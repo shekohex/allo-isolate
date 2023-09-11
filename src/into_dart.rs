@@ -101,6 +101,10 @@ impl IntoDart for bool {
     }
 }
 
+// https://github.com/sunshine-protocol/allo-isolate/pull/47
+//
+// Since Dart doesn't have a primitive list implemented for boolean (e.g. `Uint8List` for 8-bit unsigned int),
+// we should implement `IntoDartExceptPrimitive` for `bool` so that `Vec<bool>` can be converted to `List<bool>`.
 impl IntoDartExceptPrimitive for bool {}
 
 impl IntoDart for String {
