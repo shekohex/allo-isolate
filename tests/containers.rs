@@ -20,6 +20,8 @@ fn main() {
     assert!(!isolate.post(vec![42u64; 100]));
     assert!(!isolate.post(vec![42.0f32; 100]));
     assert!(!isolate.post(vec![42.0f64; 100]));
+    assert!(!isolate.post(vec![true; 100]));
+    assert!(!isolate.post(vec![false; 100]));
     assert!(!isolate.post(ZeroCopyBuffer(vec![42i8; 100])));
     assert!(!isolate.post(ZeroCopyBuffer(vec![42u8; 100])));
     assert!(!isolate.post(ZeroCopyBuffer(vec![42i16; 100])));
@@ -41,6 +43,8 @@ fn main() {
     assert!(!isolate.post([42u64; 100]));
     assert!(!isolate.post([42.0f32; 100]));
     assert!(!isolate.post([42.0f64; 100]));
+    assert!(!isolate.post([true; 100]));
+    assert!(!isolate.post([false; 100]));
     assert!(!isolate.post(ZeroCopyBuffer([42i8; 100])));
     assert!(!isolate.post(ZeroCopyBuffer([42u8; 100])));
     assert!(!isolate.post(ZeroCopyBuffer([42i16; 100])));
@@ -139,6 +143,8 @@ fn main() {
     assert!(isolate.post(vec![42u64; 100]));
     assert!(isolate.post(vec![42.0f32; 100]));
     assert!(isolate.post(vec![42.0f64; 100]));
+    assert!(isolate.post(vec![true; 100]));
+    assert!(isolate.post(vec![false; 100]));
     assert!(isolate.post(ZeroCopyBuffer(vec![42i8; 100])));
     assert!(isolate.post(ZeroCopyBuffer(vec![42u8; 100])));
     assert!(isolate.post(ZeroCopyBuffer(vec![42i16; 100])));
@@ -160,6 +166,8 @@ fn main() {
     assert!(isolate.post([42u64; 100]));
     assert!(isolate.post([42.0f32; 100]));
     assert!(isolate.post([42.0f64; 100]));
+    assert!(isolate.post([true; 100]));
+    assert!(isolate.post([false; 100]));
     assert!(isolate.post(ZeroCopyBuffer([42i8; 100])));
     assert!(isolate.post(ZeroCopyBuffer([42u8; 100])));
     assert!(isolate.post(ZeroCopyBuffer([42i16; 100])));
