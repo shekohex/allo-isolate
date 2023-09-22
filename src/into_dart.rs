@@ -163,6 +163,20 @@ where
     assert_eq!(length, vec.capacity());
     let ptr = vec.as_mut_ptr();
 
+    if length == 0 {
+        let data = DartNativeTypedData {
+            ty: T::dart_typed_data_type(),
+            length: 0,
+            values: std::ptr::null_mut(),
+        };
+        return DartCObject {
+            ty: DartCObjectType::DartTypedData,
+            value: DartCObjectValue {
+                as_typed_data: data,
+            },
+        };
+    }
+
     DartCObject {
         ty: DartCObjectType::DartExternalTypedData,
         value: DartCObjectValue {
