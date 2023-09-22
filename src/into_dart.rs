@@ -157,13 +157,7 @@ fn vec_to_dart_native_external_typed_data<T>(
 where
     T: DartTypedDataTypeTrait,
 {
-    let mut vec = ManuallyDrop::new(vec_from_rust);
-    vec.shrink_to_fit();
-    let length = vec.len();
-    assert_eq!(length, vec.capacity());
-    let ptr = vec.as_mut_ptr();
-
-    if length == 0 {
+    if vec_from_rust.len() == 0 {
         let data = DartNativeTypedData {
             ty: T::dart_typed_data_type(),
             length: 0,
@@ -176,6 +170,12 @@ where
             },
         };
     }
+    
+    let mut vec = ManuallyDrop::new(vec_from_rust);
+    vec.shrink_to_fit();
+    let length = vec.len();
+    assert_eq!(length, vec.capacity());
+    let ptr = vec.as_mut_ptr();
 
     DartCObject {
         ty: DartCObjectType::DartExternalTypedData,
