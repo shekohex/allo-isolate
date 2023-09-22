@@ -157,6 +157,20 @@ fn vec_to_dart_native_external_typed_data<T>(
 where
     T: DartTypedDataTypeTrait,
 {
+    if vec_from_rust.is_empty() {
+        let data = DartNativeTypedData {
+            ty: T::dart_typed_data_type(),
+            length: 0,
+            values: std::ptr::null_mut(),
+        };
+        return DartCObject {
+            ty: DartCObjectType::DartTypedData,
+            value: DartCObjectValue {
+                as_typed_data: data,
+            },
+        };
+    }
+
     let mut vec = ManuallyDrop::new(vec_from_rust);
     vec.shrink_to_fit();
     let length = vec.len();
