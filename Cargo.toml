@@ -1,6 +1,6 @@
 [package]
 name = "allo-isolate"
-version = "0.1.19"
+version = "0.1.20"
 authors = ["Sunshine Foundation Developers", "Shady Khalifa <dev@shadykhalifa.me>"]
 edition = "2021"
 description = "Run Multithreaded Rust along with Dart VM (in isolate)."
