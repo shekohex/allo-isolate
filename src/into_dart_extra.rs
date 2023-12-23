@@ -66,6 +66,20 @@ impl IntoDart for usize {
     }
 }
 
+#[cfg(target_pointer_width = "64")]
+impl IntoDart for isize {
+    fn into_dart(self) -> DartCObject {
+        (self as i64).into_dart()
+    }
+}
+
+#[cfg(target_pointer_width = "32")]
+impl IntoDart for isize {
+    fn into_dart(self) -> DartCObject {
+        (self as i32).into_dart()
+    }
+}
+
 impl IntoDart for char {
     fn into_dart(self) -> DartCObject {
         (self as u32).into_dart()
