@@ -78,6 +78,7 @@ fn main() {
     assert!(isolate.post(42i128));
     assert!(isolate.post(42u128));
     assert!(isolate.post(42usize));
+    assert!(isolate.post(42isize));
     assert!(isolate.post(true));
     assert!(isolate.post(false));
     assert!(isolate.post('🎊'));
