@@ -302,8 +302,7 @@ impl<T> IntoDart for HashSet<T>
         T: IntoDart,
 {
     fn into_dart(self) -> DartCObject {
-        let vec: Vec<T> = self.into_iter().collect();
-        vec.into_dart()
+        self.into_iter().collect::<Vec<T>>().into_dart()
     }
 }
 
@@ -315,8 +314,7 @@ impl<K, V> IntoDart for HashMap<K, V>
         V: IntoDart,
 {
     fn into_dart(self) -> DartCObject {
-        let vec: Vec<(K, V)> = self.into_iter().collect();
-        vec.into_dart()
+        self.into_iter().collect::<Vec<(K, V)>>().into_dart()
     }
 }
 
