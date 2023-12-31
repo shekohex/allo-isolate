@@ -1,3 +1,4 @@
+use std::collections::{HashMap, HashSet};
 use allo_isolate::{ffi::DartCObjectType, IntoDart, Isolate, ZeroCopyBuffer};
 
 mod vm;
@@ -211,6 +212,11 @@ fn main() {
     assert!(isolate.post(((true,), (123,))));
     assert!(isolate.post((ZeroCopyBuffer(vec![-1]), vec![-1], 1.1)));
     assert!(isolate.post((1, 2, 3, 4, 5, 6, 7, 8, 9, (10, 11))));
+
+    assert!(isolate.post(HashMap::from([("key".to_owned(), "value".to_owned())])));
+    assert!(isolate.post(HashMap::from([(100, 200)])));
+    assert!(isolate.post(HashSet::from(["value".to_owned()])));
+    assert!(isolate.post(HashSet::from([200])));
 
     println!("all done!");
 }
