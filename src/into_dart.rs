@@ -1,8 +1,8 @@
+use std::collections::{HashMap, HashSet};
 use std::{
     ffi::{c_void, CString},
     mem::ManuallyDrop,
 };
-use std::collections::{HashMap, HashSet};
 
 use crate::{
     dart_array::DartArray,
@@ -298,8 +298,8 @@ where
 impl<T> IntoDartExceptPrimitive for Vec<T> where T: IntoDartExceptPrimitive {}
 
 impl<T> IntoDart for HashSet<T>
-    where
-        T: IntoDart,
+where
+    T: IntoDart,
 {
     fn into_dart(self) -> DartCObject {
         DartArray::from(self.into_iter()).into_dart()
@@ -309,19 +309,21 @@ impl<T> IntoDart for HashSet<T>
 impl<T> IntoDartExceptPrimitive for HashSet<T> where T: IntoDart {}
 
 impl<K, V> IntoDart for HashMap<K, V>
-    where
-        K: IntoDart,
-        V: IntoDart,
+where
+    K: IntoDart,
+    V: IntoDart,
 {
     fn into_dart(self) -> DartCObject {
         DartArray::from(self.into_iter()).into_dart()
     }
 }
 
-impl<K, V> IntoDartExceptPrimitive for HashMap<K, V> where
+impl<K, V> IntoDartExceptPrimitive for HashMap<K, V>
+where
     K: IntoDart,
     V: IntoDart,
-{}
+{
+}
 
 impl<T, const N: usize> IntoDart for ZeroCopyBuffer<[T; N]>
 where
