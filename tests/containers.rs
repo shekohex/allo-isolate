@@ -217,8 +217,11 @@ fn main() {
         isolate.post(HashMap::from([("key".to_owned(), "value".to_owned())]))
     );
     assert!(isolate.post(HashMap::from([(100, 200)])));
+    assert!(isolate.post(HashMap::from([(100, 200u8)])));
+    assert!(isolate.post(HashMap::from([(100, vec![42u8])])));
     assert!(isolate.post(HashSet::from(["value".to_owned()])));
     assert!(isolate.post(HashSet::from([200])));
+    assert!(isolate.post(HashSet::from([200u8])));
 
     println!("all done!");
 }
