@@ -304,8 +304,8 @@ where
 impl<T> IntoDartExceptPrimitive for Vec<T> where T: IntoDartExceptPrimitive {}
 
 impl<T> IntoDart for HashSet<T>
-    where
-        T: IntoDartExceptPrimitive,
+where
+    T: IntoDartExceptPrimitive,
 {
     fn into_dart(self) -> DartCObject {
         self.into_iter().collect::<Vec<_>>().into_dart()
