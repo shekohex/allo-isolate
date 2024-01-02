@@ -1,3 +1,4 @@
+use std::collections::{HashMap, HashSet};
 use std::{
     ffi::{c_void, CString},
     mem::ManuallyDrop,
@@ -235,6 +236,12 @@ macro_rules! dart_typed_data_type_trait_impl {
                 }
             }
 
+            impl IntoDart for HashSet<$rust_type> {
+                fn into_dart(self) -> DartCObject {
+                    self.into_iter().collect::<Vec<_>>().into_dart()
+                }
+            }
+
             #[doc(hidden)]
             #[no_mangle]
             pub(crate) unsafe extern "C" fn $free_zero_copy_buffer_func(
@@ -295,6 +302,37 @@ where
 }
 
 impl<T> IntoDartExceptPrimitive for Vec<T> where T: IntoDartExceptPrimitive {}
+
+impl<T> IntoDart for HashSet<T>
+where
+    T: IntoDartExceptPrimitive,
+{
+    fn into_dart(self) -> DartCObject {
+        // Treated as `Vec<T>` and become `List` in Dart. It is unordered even though the type is a "list".
+        self.into_iter().collect::<Vec<_>>().into_dart()
+    }
+}
+
+impl<T> IntoDartExceptPrimitive for HashSet<T> where T: IntoDartExceptPrimitive {}
+
+impl<K, V> IntoDart for HashMap<K, V>
+where
+    K: IntoDart,
+    V: IntoDart,
+    (K, V): IntoDartExceptPrimitive,
+{
+    fn into_dart(self) -> DartCObject {
+        // Treated as `Vec<(K, V)>` and thus become `List<dynamic>` in Dart
+        self.into_iter().collect::<Vec<_>>().into_dart()
+    }
+}
+
+impl<K, V> IntoDartExceptPrimitive for HashMap<K, V>
+where
+    K: IntoDart,
+    V: IntoDart,
+{
+}
 
 impl<T, const N: usize> IntoDart for ZeroCopyBuffer<[T; N]>
 where
