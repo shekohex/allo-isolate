@@ -308,6 +308,7 @@ where
     T: IntoDartExceptPrimitive,
 {
     fn into_dart(self) -> DartCObject {
+        // Treated as `Vec<T>` and become `List` in Dart. It is unordered even though the type is a "list".
         self.into_iter().collect::<Vec<_>>().into_dart()
     }
 }
@@ -321,6 +322,7 @@ where
     (K, V): IntoDartExceptPrimitive,
 {
     fn into_dart(self) -> DartCObject {
+        // Treated as `Vec<(K, V)>` and thus become `List<dynamic>` in Dart
         self.into_iter().collect::<Vec<_>>().into_dart()
     }
 }
