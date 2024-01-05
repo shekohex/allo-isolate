@@ -68,7 +68,8 @@ impl IntoDart for chrono::NaiveDate {
     ///
     ///   note that it could overflow under the same conditions as of [chrono::NaiveDateTime::from_timestamp](https://docs.rs/chrono/0.4.20/chrono/naive/struct.NaiveDateTime.html#method.from_timestamp)
     fn into_dart(self) -> DartCObject {
-        self.signed_duration_since(chrono::NaiveDate::MIN).into_dart()
+        self.signed_duration_since(chrono::NaiveDate::MIN)
+            .into_dart()
     }
 }
 
@@ -159,7 +160,7 @@ impl DartTypedDataTypeTrait for chrono::DateTime<chrono::Local> {
 impl IntoDart for Vec<chrono::NaiveDate> {
     fn into_dart(self) -> DartCObject {
         self.iter()
-            .map(|lhs|lhs.signed_duration_since(chrono::NaiveDate::MIN))
+            .map(|lhs| lhs.signed_duration_since(chrono::NaiveDate::MIN))
             .collect::<Vec<_>>()
             .into_dart()
     }
