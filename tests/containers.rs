@@ -239,11 +239,15 @@ fn return_backtrace() -> backtrace::Backtrace {
 
 #[cfg(feature = "chrono")]
 fn return_chrono_naive_date() -> chrono::NaiveDate {
-    chrono::NaiveDate::from_ymd(1776, 7, 4)
+    chrono::NaiveDate::from_ymd_opt(1776, 7, 4)
+        .expect("The input date for testing is required to be valid")
 }
 #[cfg(feature = "chrono")]
 fn return_chrono_naive_date_time() -> chrono::NaiveDateTime {
-    chrono::NaiveDate::from_ymd(2016, 7, 8).and_hms_micro(9, 10, 11, 123_456)
+    chrono::NaiveDate::from_ymd_opt(2016, 7, 8)
+        .map(|nd| nd.and_hms_micro_opt(9, 10, 11, 123_456))
+        .flatten()
+        .expect("The input date and time for testing are required to be valid")
 }
 #[cfg(feature = "chrono")]
 fn return_chrono_date_time_utc() -> chrono::DateTime<chrono::Utc> {
