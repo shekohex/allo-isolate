@@ -237,7 +237,7 @@ fn return_backtrace() -> backtrace::Backtrace {
 }
 
 #[cfg(feature = "chrono")]
-fn return_chrono_naive_date_time() -> chrono::NaiveDate {
+fn return_chrono_naive_date() -> chrono::NaiveDate {
     chrono::NaiveDate::from_ymd(1776, 7, 4)
 }
 #[cfg(feature = "chrono")]
