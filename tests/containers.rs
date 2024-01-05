@@ -237,6 +237,10 @@ fn return_backtrace() -> backtrace::Backtrace {
 }
 
 #[cfg(feature = "chrono")]
+fn return_chrono_naive_date_time() -> chrono::NaiveDate {
+    chrono::NaiveDate::from_ymd(1776, 7, 4)
+}
+#[cfg(feature = "chrono")]
 fn return_chrono_naive_date_time() -> chrono::NaiveDateTime {
     chrono::NaiveDate::from_ymd(2016, 7, 8).and_hms_micro(9, 10, 11, 123_456)
 }

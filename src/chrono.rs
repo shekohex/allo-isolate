@@ -53,6 +53,25 @@ impl IntoDart for chrono::DateTime<chrono::Local> {
     }
 }
 
+impl IntoDart for chrono::NaiveDate {
+    /// on the other side of FFI, value should be reconstructed like:
+    ///
+    /// - hydrate into Dart [DateTime](https://api.dart.dev/stable/2.18.0/dart-core/DateTime/DateTime.fromMicrosecondsSinceEpoch.html)
+    ///   `DateTime.fromMicrosecondsSinceEpoch(raw, isUtc: true);`
+    ///
+    /// - hydrate into Rust [NaiveDate](chrono::NaiveDate)
+    ///   ```rust,ignore
+    ///   let s = (raw / 1_000_000) as i64;
+    ///   let ns = (raw.rem_euclid(1_000_000) * 1_000) as u32;
+    ///   chrono::NaiveDate::from_timestamp(s, ns)
+    ///   ```
+    ///
+    ///   note that it could overflow under the same conditions as of [chrono::NaiveDate::from_timestamp](https://docs.rs/chrono/0.4.20/chrono/naive/struct.NaiveDate.html#method.from_timestamp)
+    fn into_dart(self) -> DartCObject {
+        self.timestamp_micros().into_dart()
+    }
+}
+
 impl IntoDart for chrono::NaiveDateTime {
     /// on the other side of FFI, value should be reconstructed like:
     ///
@@ -128,6 +147,32 @@ impl<const N: usize> IntoDart for [chrono::DateTime<chrono::Local>; N] {
 }
 
 impl DartTypedDataTypeTrait for chrono::DateTime<chrono::Local> {
+    fn dart_typed_data_type() -> DartTypedDataType {
+        DartTypedDataType::Int64
+    }
+
+    fn function_pointer_of_free_zero_copy_buffer() -> DartHandleFinalizer {
+        free_zero_copy_buffer_i64
+    }
+}
+
+impl IntoDart for Vec<chrono::NaiveDate> {
+    fn into_dart(self) -> DartCObject {
+        self.iter()
+            .map(chrono::NaiveDate::timestamp_micros)
+            .collect::<Vec<_>>()
+            .into_dart()
+    }
+}
+
+impl<const N: usize> IntoDart for [chrono::NaiveDate; N] {
+    fn into_dart(self) -> DartCObject {
+        let vec: Vec<_> = self.into();
+        vec.into_dart()
+    }
+}
+
+impl DartTypedDataTypeTrait for chrono::NaiveDate {
     fn dart_typed_data_type() -> DartTypedDataType {
         DartTypedDataType::Int64
     }
