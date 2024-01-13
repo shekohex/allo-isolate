@@ -193,6 +193,7 @@ fn main() {
 
     #[cfg(feature = "anyhow")]
     assert!(isolate.post(return_anyhow_error()));
+    assert!(isolate.post(std::backtrace::Backtrace::capture()));
     #[cfg(feature = "backtrace")]
     assert!(isolate.post(return_backtrace()));
     #[cfg(feature = "chrono")]
@@ -223,6 +224,8 @@ fn main() {
     assert!(isolate.post(HashSet::from(["value".to_owned()])));
     assert!(isolate.post(HashSet::from([200])));
     assert!(isolate.post(HashSet::from([200u8])));
+
+    assert!(isolate.post(vec![vec![10u8]]));
 
     println!("all done!");
 }

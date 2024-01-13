@@ -53,6 +53,12 @@ impl IntoDart for anyhow::Error {
     }
 }
 
+impl IntoDart for std::backtrace::Backtrace {
+    fn into_dart(self) -> DartCObject {
+        format!("{:?}", self).into_dart()
+    }
+}
+
 #[cfg(feature = "backtrace")]
 impl IntoDart for backtrace::Backtrace {
     fn into_dart(self) -> DartCObject {
@@ -235,6 +241,8 @@ macro_rules! dart_typed_data_type_trait_impl {
                     vec_to_dart_native_external_typed_data(self)
                 }
             }
+
+            impl IntoDartExceptPrimitive for Vec<$rust_type> {}
 
             impl IntoDart for HashSet<$rust_type> {
                 fn into_dart(self) -> DartCObject {
