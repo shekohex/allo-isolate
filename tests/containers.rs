@@ -224,6 +224,8 @@ fn main() {
     assert!(isolate.post(HashSet::from([200])));
     assert!(isolate.post(HashSet::from([200u8])));
 
+    assert!(isolate.post(vec![vec![10u8]]));
+
     println!("all done!");
 }
 
