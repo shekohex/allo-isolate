@@ -193,6 +193,7 @@ fn main() {
 
     #[cfg(feature = "anyhow")]
     assert!(isolate.post(return_anyhow_error()));
+    assert!(isolate.post(std::backtrace::Backtrace::capture()));
     #[cfg(feature = "backtrace")]
     assert!(isolate.post(return_backtrace()));
     #[cfg(feature = "chrono")]

@@ -53,6 +53,12 @@ impl IntoDart for anyhow::Error {
     }
 }
 
+impl IntoDart for std::backtrace::Backtrace {
+    fn into_dart(self) -> DartCObject {
+        format!("{:?}", self).into_dart()
+    }
+}
+
 #[cfg(feature = "backtrace")]
 impl IntoDart for backtrace::Backtrace {
     fn into_dart(self) -> DartCObject {
