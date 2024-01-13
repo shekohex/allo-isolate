@@ -235,7 +235,7 @@ macro_rules! dart_typed_data_type_trait_impl {
                     vec_to_dart_native_external_typed_data(self)
                 }
             }
-            
+
             impl IntoDartExceptPrimitive for Vec<$rust_type> {}
 
             impl IntoDart for HashSet<$rust_type> {
