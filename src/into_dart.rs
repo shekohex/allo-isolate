@@ -24,8 +24,8 @@ pub trait IntoDart {
 pub trait IntoDartExceptPrimitive: IntoDart {}
 
 impl<T> IntoDart for T
-where
-    T: Into<DartCObject>,
+    where
+        T: Into<DartCObject>,
 {
     fn into_dart(self) -> DartCObject {
         self.into()
@@ -161,8 +161,8 @@ pub trait DartTypedDataTypeTrait {
 fn vec_to_dart_native_external_typed_data<T>(
     vec_from_rust: Vec<T>,
 ) -> DartCObject
-where
-    T: DartTypedDataTypeTrait,
+    where
+        T: DartTypedDataTypeTrait,
 {
     if vec_from_rust.is_empty() {
         let data = DartNativeTypedData {
@@ -286,9 +286,32 @@ dart_typed_data_type_trait_impl!(
     DartTypedDataType::Float64 => f64 + free_zero_copy_buffer_f64
 );
 
+macro_rules! isize_usize {
+    ($rust_type:ident, $delegate_target_type:ident) => {
+        impl<const N: usize> IntoDart for [$rust_type;N] {
+            fn into_dart(self) -> DartCObject {
+                let vec: Vec<_> = self.into();
+                vec.into_dart()
+            }
+        }
+
+        impl IntoDart for Vec<$rust_type> {
+            fn into_dart(self) -> DartCObject {
+                let vec: Vec<$delegate_target_type> = self.into_iter().map(|x| x as _).collect();
+                vec.into_dart()
+            }
+        }
+
+        impl IntoDartExceptPrimitive for Vec<$rust_type> {}
+    }
+}
+
+isize_usize!(isize, i64);
+isize_usize!(usize, u64);
+
 impl<T> IntoDart for ZeroCopyBuffer<Vec<T>>
-where
-    T: DartTypedDataTypeTrait,
+    where
+        T: DartTypedDataTypeTrait,
 {
     fn into_dart(self) -> DartCObject {
         vec_to_dart_native_external_typed_data(self.0)
@@ -297,12 +320,11 @@ where
 
 impl<T> IntoDartExceptPrimitive for ZeroCopyBuffer<Vec<T>> where
     T: DartTypedDataTypeTrait
-{
-}
+{}
 
 impl<T> IntoDart for Vec<T>
-where
-    T: IntoDartExceptPrimitive,
+    where
+        T: IntoDartExceptPrimitive,
 {
     fn into_dart(self) -> DartCObject {
         DartArray::from(self.into_iter()).into_dart()
@@ -312,8 +334,8 @@ where
 impl<T> IntoDartExceptPrimitive for Vec<T> where T: IntoDartExceptPrimitive {}
 
 impl<T> IntoDart for HashSet<T>
-where
-    T: IntoDartExceptPrimitive,
+    where
+        T: IntoDartExceptPrimitive,
 {
     fn into_dart(self) -> DartCObject {
         // Treated as `Vec<T>` and become `List` in Dart. It is unordered even though the type is a "list".
@@ -324,10 +346,10 @@ where
 impl<T> IntoDartExceptPrimitive for HashSet<T> where T: IntoDartExceptPrimitive {}
 
 impl<K, V> IntoDart for HashMap<K, V>
-where
-    K: IntoDart,
-    V: IntoDart,
-    (K, V): IntoDartExceptPrimitive,
+    where
+        K: IntoDart,
+        V: IntoDart,
+        (K, V): IntoDartExceptPrimitive,
 {
     fn into_dart(self) -> DartCObject {
         // Treated as `Vec<(K, V)>` and thus become `List<dynamic>` in Dart
@@ -336,15 +358,14 @@ where
 }
 
 impl<K, V> IntoDartExceptPrimitive for HashMap<K, V>
-where
-    K: IntoDart,
-    V: IntoDart,
-{
-}
+    where
+        K: IntoDart,
+        V: IntoDart,
+{}
 
 impl<T, const N: usize> IntoDart for ZeroCopyBuffer<[T; N]>
-where
-    T: DartTypedDataTypeTrait,
+    where
+        T: DartTypedDataTypeTrait,
 {
     fn into_dart(self) -> DartCObject {
         let vec: Vec<_> = self.0.into();
@@ -354,12 +375,11 @@ where
 
 impl<T, const N: usize> IntoDartExceptPrimitive for ZeroCopyBuffer<[T; N]> where
     T: DartTypedDataTypeTrait
-{
-}
+{}
 
 impl<T, const N: usize> IntoDart for [T; N]
-where
-    T: IntoDartExceptPrimitive,
+    where
+        T: IntoDartExceptPrimitive,
 {
     fn into_dart(self) -> DartCObject {
         DartArray::from(IntoIterator::into_iter(self)).into_dart()
@@ -367,8 +387,8 @@ where
 }
 
 impl<T> IntoDart for Option<T>
-where
-    T: IntoDart,
+    where
+        T: IntoDart,
 {
     fn into_dart(self) -> DartCObject {
         match self {
@@ -381,9 +401,9 @@ where
 impl<T> IntoDartExceptPrimitive for Option<T> where T: IntoDart {}
 
 impl<T, E> IntoDart for Result<T, E>
-where
-    T: IntoDart,
-    E: ToString,
+    where
+        T: IntoDart,
+        E: ToString,
 {
     fn into_dart(self) -> DartCObject {
         match self {
@@ -394,11 +414,10 @@ where
 }
 
 impl<T, E> IntoDartExceptPrimitive for Result<T, E>
-where
-    T: IntoDart,
-    E: ToString,
-{
-}
+    where
+        T: IntoDart,
+        E: ToString,
+{}
 
 /// A workaround to send raw pointers to dart over the port.
 /// it will be sent as int64 on 64bit targets, and as int32 on 32bit targets.
