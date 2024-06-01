@@ -302,6 +302,13 @@ macro_rules! isize_usize {
             }
         }
 
+        impl<const N: usize> IntoDart for ZeroCopyBuffer<[$rust_type;N]> {
+            fn into_dart(self) -> DartCObject {
+                let vec: Vec<$rust_type> = self.0.into();
+                ZeroCopyBuffer(vec).into_dart()
+            }
+        }
+
         impl IntoDart for ZeroCopyBuffer<Vec<$rust_type>> {
             fn into_dart(self) -> DartCObject {
                 let vec: Vec<$delegate_target_type> = self.0.into_iter().map(|x| x as _).collect();
