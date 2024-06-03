@@ -286,6 +286,45 @@ dart_typed_data_type_trait_impl!(
     DartTypedDataType::Float64 => f64 + free_zero_copy_buffer_f64
 );
 
+macro_rules! isize_usize {
+    ($rust_type:ident, $delegate_target_type:ident) => {
+        impl<const N: usize> IntoDart for [$rust_type; N] {
+            fn into_dart(self) -> DartCObject {
+                let vec: Vec<_> = self.into();
+                vec.into_dart()
+            }
+        }
+
+        impl IntoDart for Vec<$rust_type> {
+            fn into_dart(self) -> DartCObject {
+                let vec: Vec<$delegate_target_type> =
+                    self.into_iter().map(|x| x as _).collect();
+                vec.into_dart()
+            }
+        }
+
+        impl<const N: usize> IntoDart for ZeroCopyBuffer<[$rust_type; N]> {
+            fn into_dart(self) -> DartCObject {
+                let vec: Vec<$rust_type> = self.0.into();
+                ZeroCopyBuffer(vec).into_dart()
+            }
+        }
+
+        impl IntoDart for ZeroCopyBuffer<Vec<$rust_type>> {
+            fn into_dart(self) -> DartCObject {
+                let vec: Vec<$delegate_target_type> =
+                    self.0.into_iter().map(|x| x as _).collect();
+                ZeroCopyBuffer(vec).into_dart()
+            }
+        }
+
+        impl IntoDartExceptPrimitive for Vec<$rust_type> {}
+    };
+}
+
+isize_usize!(isize, i64);
+isize_usize!(usize, u64);
+
 impl<T> IntoDart for ZeroCopyBuffer<Vec<T>>
 where
     T: DartTypedDataTypeTrait,
