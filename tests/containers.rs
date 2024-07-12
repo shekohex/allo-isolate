@@ -245,6 +245,11 @@ fn main() {
 
     assert!(isolate.post(vec![vec![10u8]]));
 
+    // Test case to verify that dropping vectors using ZeroCopyBuffer no longer causes a panic
+    let a: ZeroCopyBuffer<Vec<u64>> = ZeroCopyBuffer(vec![]);
+    let b = a.into_dart();
+    drop(b);
+
     println!("all done!");
 }
 

@@ -182,6 +182,9 @@ impl Drop for DartCObject {
                 struct MyVisitor<'a>(&'a DartNativeTypedData);
                 impl DartTypedDataTypeVisitor for MyVisitor<'_> {
                     fn visit<T: DartTypedDataTypeTrait>(&self) {
+                        if self.0.values.is_null() {
+                            return;
+                        }
                         let _ = unsafe {
                             Vec::from_raw_parts(
                                 self.0.values as *mut T,
