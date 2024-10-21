@@ -184,6 +184,10 @@ where
     assert_eq!(length, vec.capacity());
     let ptr = vec.as_mut_ptr();
 
+    let raw_slice = Box::into_raw(Box::new(
+        std::ptr::slice_from_raw_parts_mut(ptr, length),
+    ));
+
     DartCObject {
         ty: DartCObjectType::DartExternalTypedData,
         value: DartCObjectValue {
@@ -191,7 +195,7 @@ where
                 ty: T::dart_typed_data_type(),
                 length: length as isize,
                 data: ptr as *mut u8,
-                peer: ptr as *mut c_void,
+                peer: raw_slice as *mut c_void,
                 callback: T::function_pointer_of_free_zero_copy_buffer(),
             },
         },
@@ -253,12 +257,12 @@ macro_rules! dart_typed_data_type_trait_impl {
             #[doc(hidden)]
             #[no_mangle]
             pub(crate) unsafe extern "C" fn $free_zero_copy_buffer_func(
-                isolate_callback_data: *mut c_void,
+                _isolate_callback_data: *mut c_void,
                 peer: *mut c_void,
             ) {
-                let len = (isolate_callback_data as isize) as usize;
-                let ptr = peer as *mut $rust_type;
-                drop(Vec::from_raw_parts(ptr, len, len));
+                let raw_slice = Box::from_raw(peer.cast::<*mut [u8]>());
+                let len = raw_slice.len();
+                drop(Vec::from_raw_parts(raw_slice.cast::<u8>(), len, len));
             }
         )+
 
