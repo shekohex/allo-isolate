@@ -232,7 +232,7 @@ pub unsafe fn run_destructors(obj: &DartCObject) {
     match obj.ty {
         DartExternalTypedData => unsafe {
             (obj.value.as_external_typed_data.callback)(
-                obj.value.as_external_typed_data.data as *mut c_void,
+                obj.value.as_external_typed_data.length as *mut c_void,
                 obj.value.as_external_typed_data.peer,
             )
         },
