@@ -260,9 +260,9 @@ macro_rules! dart_typed_data_type_trait_impl {
                 _isolate_callback_data: *mut c_void,
                 peer: *mut c_void,
             ) {
-                let raw_slice = Box::from_raw(peer.cast::<*mut [u8]>());
+                let raw_slice = Box::from_raw(peer.cast::<*mut [$rust_type]>());
                 let len = raw_slice.len();
-                drop(Vec::from_raw_parts(raw_slice.cast::<u8>(), len, len));
+                drop(Vec::from_raw_parts(raw_slice.cast::<$rust_type>(), len, len));
             }
         )+
 
