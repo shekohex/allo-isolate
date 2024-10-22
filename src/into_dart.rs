@@ -178,7 +178,7 @@ where
         };
     }
 
-    let mut vec = ManuallyDrop::new(vec_from_rust);
+    let mut vec = vec_from_rust;
     vec.shrink_to_fit();
     let length = vec.len();
     assert_eq!(length, vec.capacity());
@@ -191,7 +191,7 @@ where
                 ty: T::dart_typed_data_type(),
                 length: length as isize,
                 data: ptr as *mut u8,
-                peer: ptr as *mut c_void,
+                peer: Box::into_raw(Box::new(vec)).cast(),
                 callback: T::function_pointer_of_free_zero_copy_buffer(),
             },
         },
@@ -253,12 +253,10 @@ macro_rules! dart_typed_data_type_trait_impl {
             #[doc(hidden)]
             #[no_mangle]
             pub(crate) unsafe extern "C" fn $free_zero_copy_buffer_func(
-                isolate_callback_data: *mut c_void,
+                _isolate_callback_data: *mut c_void,
                 peer: *mut c_void,
             ) {
-                let len = (isolate_callback_data as isize) as usize;
-                let ptr = peer as *mut $rust_type;
-                drop(Vec::from_raw_parts(ptr, len, len));
+                drop(Box::from_raw(peer.cast::<Vec<$rust_type>>()));
             }
         )+
 
