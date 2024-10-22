@@ -178,15 +178,11 @@ where
         };
     }
 
-    let mut vec = ManuallyDrop::new(vec_from_rust);
+    let mut vec = vec_from_rust;
     vec.shrink_to_fit();
     let length = vec.len();
     assert_eq!(length, vec.capacity());
     let ptr = vec.as_mut_ptr();
-
-    let raw_slice = Box::into_raw(Box::new(
-        std::ptr::slice_from_raw_parts_mut(ptr, length),
-    ));
 
     DartCObject {
         ty: DartCObjectType::DartExternalTypedData,
@@ -195,7 +191,7 @@ where
                 ty: T::dart_typed_data_type(),
                 length: length as isize,
                 data: ptr as *mut u8,
-                peer: raw_slice as *mut c_void,
+                peer: Box::into_raw(Box::new(vec)).cast(),
                 callback: T::function_pointer_of_free_zero_copy_buffer(),
             },
         },
@@ -260,9 +256,7 @@ macro_rules! dart_typed_data_type_trait_impl {
                 _isolate_callback_data: *mut c_void,
                 peer: *mut c_void,
             ) {
-                let raw_slice = Box::from_raw(peer.cast::<*mut [$rust_type]>());
-                let len = raw_slice.len();
-                drop(Vec::from_raw_parts(raw_slice.cast::<$rust_type>(), len, len));
+                drop(Box::from_raw(peer.cast::<Vec<$rust_type>>()));
             }
         )+
 
