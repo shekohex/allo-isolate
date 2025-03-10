@@ -133,16 +133,12 @@ impl Isolate {
     pub fn post(&self, msg: impl IntoDart) -> bool {
         if let Some(func) = POST_COBJECT.load(Ordering::Relaxed) {
             unsafe {
-                let boxed_msg = Box::new(msg.into_dart());
-                let ptr = Box::into_raw(boxed_msg);
+                let mut msg = msg.into_dart();
                 // Send the message
-                let result = func(self.port, ptr);
-                // free the object
-                let mut boxed_obj = Box::from_raw(ptr);
+                let result = func(self.port, &mut msg);
                 if !result {
-                    ffi::run_destructors(boxed_obj.as_mut())
+                    ffi::run_destructors(&msg);
                 }
-                drop(boxed_obj);
                 // I like that dance haha
                 result
             }
