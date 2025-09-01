@@ -245,6 +245,10 @@ fn main() {
 
     assert!(isolate.post(vec![vec![10u8]]));
 
+    // Test 2D array support - this is what PR #66 enables
+    let arr_2d: [[bool; 3]; 2] = [[true, false, true], [false, true, false]];
+    assert!(isolate.post(arr_2d));
+
     // Test case to verify that dropping vectors using ZeroCopyBuffer no longer causes a panic
     let a: ZeroCopyBuffer<Vec<u64>> = ZeroCopyBuffer(vec![]);
     let b = a.into_dart();

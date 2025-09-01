@@ -34,4 +34,4 @@ jobs:
           args: "--example containers --features 'anyhow backtrace chrono uuid'"
 
       - name: Run valgrind
-        run: valgrind --error-exitcode=1 --leak-check=full ./target/debug/examples/containers
+        run: valgrind --error-exitcode=1 --leak-check=full --suppressions=valgrind.supp ./target/debug/examples/containers

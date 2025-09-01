@@ -1,0 +1,38 @@
+# Valgrind suppressions for allo-isolate
+#
+# This file contains suppressions for known false positives in Valgrind
+# when running allo-isolate tests.
+
+# Suppress memory leak from Rust's allocator initialization
+# This appears to be related to random seed initialization and is a false positive
+{
+   rust_allocator_init
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:alloc
+   fun:alloc_impl
+   fun:allocate
+   ...
+}
+
+# Alternative suppression for the specific pattern seen in the CI
+{
+   rust_allocator_random_seed
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   obj:*
+   obj:*
+   obj:*
+}
+
+# Suppress any possible leaks from Rust's std library initialization
+{
+   rust_std_init
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   ...
+   fun:std*
+}

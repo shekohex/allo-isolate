@@ -403,6 +403,11 @@ where
     }
 }
 
+impl<T, const N: usize> IntoDartExceptPrimitive for [T; N] where
+    T: IntoDartExceptPrimitive
+{
+}
+
 impl<T> IntoDart for Option<T>
 where
     T: IntoDart,
